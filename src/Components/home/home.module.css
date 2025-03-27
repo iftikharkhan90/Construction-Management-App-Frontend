@@ -1,0 +1,11 @@
+.main{
+    /* float: right; */
+    width: 100%;
+}
+.f{
+    width: 40%;
+}
+.second{
+    width: 60%;
+    float: right;
+}

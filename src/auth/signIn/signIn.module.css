@@ -1,0 +1,23 @@
+.sign{
+    border: 1px solid black;
+    border-radius: 20px;
+    width: 50% !important;
+    background-color: cadetblue;
+    /* background-image: url('../../assets/pic.jpg'); */
+}
+@media (min-width:320px) and (max-width:767px) {
+    .sign{
+        width: 100% !important;
+    }
+}
+form{
+    width: 100%;
+    height: 400px;
+    background-image: url('../../assets/pic.jpg');
+    background-size: cover;
+}
+.oka{
+    background-image: url('../../assets/bg-pic1.jpg');
+    background-size: cover;
+    height: 100vh;
+}
