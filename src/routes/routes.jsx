@@ -11,7 +11,7 @@ import Sanitary from "../pages/sanitary/sanitary";
 import Tiles from "../pages/tiles/tiles";
 import Wood from "../pages/wood/wood";
 import Aluminium from "../pages/Aluminium/aluninium";
-import  PrivateRoute  from "./privateRoutes";
+import  PrivateRoute  from "./PrivateRoutes";
 // import { PrivateRoute } from "./PrivateRoutes";
 
 export default function LogRoutes() {
