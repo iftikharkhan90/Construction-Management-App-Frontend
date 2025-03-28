@@ -9,11 +9,9 @@ import Cookies from "js-cookie";
 export default function Login() {
 
 useEffect(() => {
-  Cookies.remove("token"); // ✅ Jab login page open ho, token remove ho jaye
+  Cookies.remove("token"); 
   console.log("Token removed on login page load");
 }, []);
-
-
 
   const [formData, setFormData] = useState({
     email: "",
@@ -32,11 +30,10 @@ useEffect(() => {
     
     try {
       const response = await axios.post(
-        "http://localhost:3002/api/login",
+        "https://construction-management-app-backend.vercel.app/api/login",
         formData,
         {
           headers: {
-            // Authorization: `Bearer ${token}`, // Token yahan bhejo
             "Content-Type": "application/json",
           },
         }
@@ -54,8 +51,8 @@ useEffect(() => {
       if (token) {
         toast.success("User Login Successfully", {
           position: "top-center",
-          autoClose: 2000, // Toast 3 sec tak rahega
-          onClose: () => navigate("/home"), // Toast close hone ke baad navigate karega
+          autoClose: 2000, 
+          onClose: () => navigate("/home"), 
         });
       } else {
         navigate("/");
@@ -65,7 +62,6 @@ useEffect(() => {
         "ERROR:",
         error.response ? error.response.data : error.message
       );
-
       if (error.response && error.response.status === 401) {
         toast.error(
           error.response.data.message || "Given Email or Password is incorrect",
@@ -91,7 +87,6 @@ useEffect(() => {
         className={`${style.log} container p-5`}
       >
         <h1>: Login :</h1>
-
         <div className="form-floating mb-3 mt-4">
           <input
             type="email"
@@ -120,19 +115,16 @@ useEffect(() => {
 
         <button
           type="submit"
-          className={`btn btn-info mb-1 ${!isFormValid ? "disabled" : ""}`}
+          className={`btn btn-info m-5 mb-1 ${!isFormValid ? "disabled" : ""}`}
         >
           Login
         </button>
-
         <br />
 
         <Link to={"/sign"} className={`btn btn-secondary mt-2`}>
-          Sign In for register
+          Sign Up for register
         </Link>
       </form>
-
-      {/* ✅ Toast container added */}
       <ToastContainer />
     </div>
   );

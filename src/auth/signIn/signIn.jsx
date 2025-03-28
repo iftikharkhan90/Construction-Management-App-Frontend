@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import style from './signIn.module.css';
-import { Link,  useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,32 +11,21 @@ export default function SignIn() {
     email: '',
     password: ''
   });
-console.log(formData);
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const isFormValid = formData.name && formData.email && formData.password;
-
-
 const navigate = useNavigate();
-console.log("hey");
 
 const handleSubmit = async (e)=>{
   e.preventDefault()
   try {
-          // const data = new FormData();
-          // data.append("name", formData.name);
-          // data.append("email", formData.email);
-          // data.append("password", formData.password);
 const response = await axios.post(
-  "http://localhost:3002/api/signup",
-  formData,
+  "https://construction-management-app-backend.vercel.app/api/signup",
+  formData
 );
-    console.log("oka hy");
-    console.log("Response" , response.data);
-        
+    console.log("Response" , response.data);      
     setFormData({
       name:"",
       email:"",
@@ -54,9 +43,7 @@ const response = await axios.post(
       toast.error("An error occured . Please try again later" , {position:'top-center' , autoClose:3000})
     } 
   }
-
 }
-
 
   return (
     <div className={`${style.oka} p-5`}>
@@ -64,9 +51,9 @@ const response = await axios.post(
         <form
           onSubmit={handleSubmit}
           method="POST"
-          className={`${style.sign} p-5`}
+          className={`${style.sign} signup p-5`}
         >
-          <h1> : Sign in :</h1>
+          <h1> : Sign Up :</h1>
 
           <div className="form-floating mb-3 mt-4">
             <input
@@ -113,8 +100,9 @@ const response = await axios.post(
               type="submit"
               className={`btn btn-success ${!isFormValid ? "disabled" : ""}`}
             >
-              Sign in
+              Sign Up
             </button>
+            <p>Already having a account ? <Link to="/">Login</Link></p>
         </form>
       </center>
       <ToastContainer/>

@@ -4,11 +4,8 @@ import Cookies from "js-cookie";
 
 const PrivateRoute = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
-
   useEffect(() => {
     const token = Cookies.get("token");
-    console.log("Token from cookies:", token);
-
     if (token) {
       setIsAuthenticated(true);
     } else {
@@ -17,9 +14,8 @@ const PrivateRoute = () => {
   }, []);
 
   if (isAuthenticated === null) {
-    return <p>Loading...</p>; // ✅ Jab tak token verify ho raha hai, loading show karega
+    return <p>Loading...</p>; 
   }
-
   return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
 };
 

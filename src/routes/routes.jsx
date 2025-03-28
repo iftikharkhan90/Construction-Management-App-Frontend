@@ -12,25 +12,15 @@ import Tiles from "../pages/tiles/tiles";
 import Wood from "../pages/wood/wood";
 import Aluminium from "../pages/Aluminium/aluninium";
 import  PrivateRoute  from "./PrivateRoutes";
-// import { PrivateRoute } from "./PrivateRoutes";
 
 export default function LogRoutes() {
-
-  
-
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/sign" element={<SignIn />} />
-      {/* <Route path="/home" element={<Home />} /> */}
       <Route  element={<PrivateRoute />} >
         <Route path="/home" element={<Home/>}  />
       </Route>
-
-
-
-
-
       <Route path="/aluminium" element={<Aluminium />} />
       <Route path="/building" element={<Building />} />
       <Route path="/ceiling" element={<Ceiling />} />
