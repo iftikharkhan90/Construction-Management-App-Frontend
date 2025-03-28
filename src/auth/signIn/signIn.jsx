@@ -22,8 +22,8 @@ const handleSubmit = async (e)=>{
   e.preventDefault()
   try {
 const response = await axios.post(
-  "http://localhost:3002/api/signup",
-  formData,
+  "https://construction-management-app-backend.vercel.app/api/signup",
+  formData
 );
     console.log("Response" , response.data);      
     setFormData({
