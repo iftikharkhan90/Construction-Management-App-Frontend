@@ -21,7 +21,8 @@ const Wood = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://construction-management-app-backend-kpp2.vercel.app/api/getmaterials",
+        "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
+
         {
           params: { type: "Wood" },
         }
@@ -107,7 +108,7 @@ const Wood = () => {
 
     try {
       const response = await axios.post(
-        "https://construction-management-app-backend-kpp2.vercel.app/api/material",
+        "https://construction-management-app-backend-qqvu.vercel.app/api/material",
 
         newItem
       );
@@ -141,7 +142,7 @@ const Wood = () => {
 
     try {
       await axios.put(
-        `https://construction-management-app-backend-kpp2.vercel.app/api/update/${selectedItem._id}`,
+        `https://construction-management-app-backend-qqvu.vercel.app/api/update/${selectedItem._id}`,
 
         newItem
       );
@@ -162,8 +163,9 @@ const Wood = () => {
   // ✅ Delete Item (DELETE)
   const handleDeleteItem = async (id) => {
     try {
-      `https://construction-management-app-backend-kpp2.vercel.app/api/del/${id}`;
-
+      await axios.delete(
+        `https://construction-management-app-backend-qqvu.vercel.app/api/del/${id}`
+      );
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
       fetchData(); // ✅ Refresh data immediately
