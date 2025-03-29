@@ -27,7 +27,7 @@ const Building = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3002/api/getmaterials",
+        "https://construction-management-app-backend-kpp2.vercel.app/api/getmaterials",
         {
           params: { type: "Building" },
         }
@@ -113,7 +113,7 @@ const Building = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3002/api/material",
+        "https://construction-management-app-backend-kpp2.vercel.app/api/material",
         newItem
       );
       if (response.data && response.data.DATA) {
@@ -146,7 +146,7 @@ const Building = () => {
 
     try {
       await axios.put(
-        `http://localhost:3002/api/update/${selectedItem._id}`,
+        `https://construction-management-app-backend-kpp2.vercel.app/api/update/${selectedItem._id}`,
         newItem
       );
       setData((prev) =>
@@ -166,8 +166,9 @@ const Building = () => {
   // ✅ Delete Item (DELETE)
   const handleDeleteItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:3002/api/del/${id}`);
-      alert("Are You Sure ?")
+      await axios.delete(
+        `https://construction-management-app-backend-kpp2.vercel.app/api/del/${id}`
+      );
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
       fetchData(); // ✅ Refresh data immediately
