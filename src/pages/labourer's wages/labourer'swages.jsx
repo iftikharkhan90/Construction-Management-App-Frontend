@@ -19,7 +19,9 @@ const LabourersWages = () => {
   const fetchData = async () => {
     
     try {
-      const response = await axios.get("http://localhost:3002/api/getcons");
+      const response = await axios.get(
+        "https://construction-management-app-backend-kpp2.vercel.app/api/getcons"
+      );
       if (Array.isArray(response.data.data)) {
         setData(response.data.data);
       } else {
@@ -88,7 +90,6 @@ const LabourersWages = () => {
       !newItem.name ||
       !newItem.totalAmount ||
       !newItem.payAmount ||
-      // !newItem.remainingAmount ||
       !newItem.type
     ) {
       showToast("Please fill all fields!", "warning");
@@ -97,7 +98,7 @@ const LabourersWages = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3002/api/cons",
+        "https://construction-management-app-backend-kpp2.vercel.app/api/cons",
         newItem
       );
       console.log("Response" , response.data.Data);
@@ -107,7 +108,7 @@ const LabourersWages = () => {
         
         setData((prev) => [...prev, response.data.Data]);
         showToast("Item added successfully!", "success");
-        fetchData(); // ✅ Refresh data immediately
+        fetchData(); 
         handleCloseModal();
       }
     } catch (error) {
@@ -122,7 +123,6 @@ const LabourersWages = () => {
       !newItem.name ||
       !newItem.totalAmount ||
       !newItem.payAmount ||
-      // !newItem.remainingAmount ||
       !newItem.type
     ) {
       showToast("Please fill all fields!", "warning");
@@ -131,7 +131,7 @@ const LabourersWages = () => {
 
     try {
       await axios.put(
-        `http://localhost:3002/api/updatecons/${selectedItem._id}`,
+        `https://construction-management-app-backend-kpp2.vercel.app/api/updatecons/${selectedItem._id}`,
         newItem
       );
       setData((prev) =>
@@ -151,7 +151,9 @@ const LabourersWages = () => {
   // ✅ Delete Item (DELETE)
   const handleDeleteItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:3002/api/delcons/${id}`);
+      await axios.delete(
+        `https://construction-management-app-backend-kpp2.vercel.app/api/delcons/${id}`
+      );
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
       fetchData(); // ✅ Refresh data immediately
@@ -229,12 +231,12 @@ const LabourersWages = () => {
       {/* ✅ Add/Edit Modal */}
       {showModal && (
         <div
-          className="modal fade show d-block"
+          className="modal fade show d-block pt-5 "
           style={{ background: "rgba(0,0,0,0.6)" }}
         >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
+          <div className="modal-dialog mt-5 p-lg-1 p-sm-5 ">
+            <div className="modal-content ">
+              <div className="modal-header ">
                 <h5 className="modal-title">
                   {isEditMode ? "Edit Material" : "Add New Material"}
                 </h5>

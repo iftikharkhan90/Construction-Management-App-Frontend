@@ -50,7 +50,7 @@ toast.success("User Logout Successfully", {
 
       {/* Sidebar */}
       <div className={`${style.one} ${showSidebar ? style.showSidebar : ""}`}>
-        <div className={`flex-column justify-content-end ${style.head}`}>
+        <div className={`flex-column justify-content-center ${style.head}`}>
           <nav className="navbar navbar-expand-lg flex-column align-items-center vh-100 p-3">
             <ul
               className={`navbar-nav flex-column align-items-center w-100 ${style.itemHead}`}

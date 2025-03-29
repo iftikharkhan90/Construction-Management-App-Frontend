@@ -20,7 +20,7 @@ const Aluminium = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3002/api/getmaterials",
+        "https://construction-management-app-backend-kpp2.vercel.app/api/getmaterials",
         {
           params: { type: "Aluminium" },
         }
@@ -99,18 +99,19 @@ const Aluminium = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3002/api/material",
+        "https://construction-management-app-backend-kpp2.vercel.app/api/material",
+
         newItem
       );
       if (response.data && response.data.DATA) {
         setData((prev) => [...prev, response.data.DATA]);
         showToast("Item added successfully!", "success");
-        fetchData(); 
+        fetchData();
         handleCloseModal();
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        showToast("Item already exists!", "error"); 
+        showToast("Item already exists!", "error");
       } else {
         showToast("Error adding item", "error");
         console.error(error.message);
@@ -131,7 +132,8 @@ const Aluminium = () => {
 
     try {
       await axios.put(
-        `http://localhost:3002/api/update/${selectedItem._id}`,
+        `https://construction-management-app-backend-kpp2.vercel.app/api/update/${selectedItem._id}`,
+
         newItem
       );
       setData((prev) =>
@@ -150,7 +152,8 @@ const Aluminium = () => {
 
   const handleDeleteItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:3002/api/del/${id}`);
+      `https://construction-management-app-backend-kpp2.vercel.app/api/del/${id}`;
+
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
       fetchData(); // ✅ Refresh data immediately
@@ -225,10 +228,10 @@ const Aluminium = () => {
           </table>
         </div>
       </div>
-      
+
       {showModal && (
         <div
-          className="modal fade show d-block"
+          className="modal fade show d-block pt-5"
           style={{ background: "rgba(0,0,0,0.6)" }}
         >
           <div className="modal-dialog mt-5 p-lg-1 p-sm-5">
@@ -279,6 +282,3 @@ const Aluminium = () => {
 };
 
 export default Aluminium;
-
-
-
