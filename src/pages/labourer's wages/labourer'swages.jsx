@@ -93,21 +93,18 @@ const LabourersWages = () => {
         newItem
       );
       console.log("Response" , response.data.Data);
-      
-      if (response.data && response.data.Data) {
-        console.log("hiiiii");
-        
+      if (response.data && response.data.Data) {        
         setData((prev) => [...prev, response.data.Data]);
         showToast("Item added successfully!", "success");
         fetchData(); 
         handleCloseModal();
       }
     } catch (error) {
-      if (error.response.data?.message) {
-        showToast(error.response.data?.message , "error")
+      if (error.response && error.response.status === 401) {
+        showToast(error.response.data?.message, "error")
       } else {
-        showToast("Error while adding item" , "error")
-        console.error(error.message)
+        showToast("Error while adding item", "error");
+        console.error(error.message);
       }
     }
   };

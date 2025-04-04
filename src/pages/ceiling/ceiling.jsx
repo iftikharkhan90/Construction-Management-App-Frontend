@@ -112,9 +112,9 @@ const Ceiling = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        showToast("Item already exists!", "error")
+        showToast(error.response.data?.message, "error")
       } else {
-        showToast("Error adding item", "error")
+        showToast("Error adding item", "error");
         console.error(error.message);
       }
     }
