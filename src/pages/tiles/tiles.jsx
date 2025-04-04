@@ -185,7 +185,7 @@ const Tiles = () => {
                 <th>Total Amount</th>
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
-                <th>Action</th>
+                {/* <th>Action</th> */}
               </tr>
             </thead>
             <tbody>
@@ -199,7 +199,7 @@ const Tiles = () => {
                     <td>{item.totalAmount}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
-                    <td>
+                    {/* <td>
                       <button
                         className="btn btn-sm btn-warning me-2"
                         onClick={() => handleEditClick(item)}
@@ -212,7 +212,7 @@ const Tiles = () => {
                       >
                         Delete
                       </button>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               ) : (
