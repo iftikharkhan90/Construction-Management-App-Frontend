@@ -17,12 +17,10 @@ const Sanitary = () => {
     type: "Sanitary",
   });
 
-  // ✅ Fetch Data from API
   const fetchData = async () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-
         {
           params: { type: "Sanitary" },
         }
@@ -42,12 +40,10 @@ const Sanitary = () => {
     fetchData();
   }, []);
 
-  // ✅ Capitalize First Letter
   const capitalizeFirstLetter = (text) => {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
-  // ✅ Handle Input Change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewItem((prev) => ({
@@ -56,12 +52,10 @@ const Sanitary = () => {
     }));
   };
 
-  // ✅ Show Toast Messages
   const showToast = (message, type) => {
     toast(message, { type, position: "top-center", autoClose: 2000 });
   };
 
-  // ✅ Open Add Modal
   const handleAddClick = () => {
     setIsEditMode(false);
     setNewItem({
@@ -74,7 +68,6 @@ const Sanitary = () => {
     setShowModal(true);
   };
 
-  // ✅ Open Edit Modal
   const handleEditClick = (item) => {
     setIsEditMode(true);
     setSelectedItem(item);
@@ -88,13 +81,11 @@ const Sanitary = () => {
     setShowModal(true);
   };
 
-  // ✅ Close Modal
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedItem(null);
   };
 
-  // ✅ Add New Item (POST)
   const handleAddItem = async () => {
     if (
       !newItem.itemName ||
@@ -105,22 +96,20 @@ const Sanitary = () => {
       showToast("Please fill all fields!", "warning");
       return;
     }
-
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/material",
-
         newItem
       );
       if (response.data && response.data.DATA) {
-        setData((prev) => [...prev, response.data.DATA]);
-        showToast("Item added successfully!", "success");
-        fetchData(); // ✅ Refresh data immediately
+        setData((prev) => [...prev, response.data.DATA])
+        showToast("Item added successfully!", "success")
+        fetchData()
         handleCloseModal();
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        showToast("Item already exists!", "error"); // ⚠️ Show proper error
+        showToast("Item already exists!", "error")
       } else {
         showToast("Error adding item", "error");
         console.error(error.message);
@@ -128,7 +117,6 @@ const Sanitary = () => {
     }
   };
 
-  // ✅ Update Existing Item (PUT)
   const handleEditItem = async () => {
     if (
       !newItem.itemName ||
@@ -139,7 +127,6 @@ const Sanitary = () => {
       showToast("Please fill all fields!", "warning");
       return;
     }
-
     try {
       await axios.put(
         `https://construction-management-app-backend-qqvu.vercel.app/api/update/${selectedItem._id}`,
@@ -152,7 +139,7 @@ const Sanitary = () => {
         )
       );
       showToast("Item updated successfully!", "success");
-      fetchData(); // ✅ Refresh data immediately
+      fetchData()
       handleCloseModal();
     } catch (error) {
       showToast("Error updating item", "error");
@@ -160,7 +147,6 @@ const Sanitary = () => {
     }
   };
 
-  // ✅ Delete Item (DELETE)
   const handleDeleteItem = async (id) => {
     try {
       await axios.delete(
@@ -169,7 +155,7 @@ const Sanitary = () => {
 
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
-      fetchData(); // ✅ Refresh data immediately
+      fetchData(); 
     } catch (error) {
       showToast("Error deleting item", "error");
       console.error(error.message);
@@ -189,7 +175,6 @@ const Sanitary = () => {
           </button>
         </div>
 
-        {/* ✅ Table to Show Data */}
         <div className="panel-body table-responsive mt-3">
           <table className="table table-bordered text-white">
             <thead>
@@ -243,7 +228,6 @@ const Sanitary = () => {
         </div>
       </div>
 
-      {/* ✅ Add/Edit Modal */}
       {showModal && (
         <div
           className="modal fade show d-block pt-5"

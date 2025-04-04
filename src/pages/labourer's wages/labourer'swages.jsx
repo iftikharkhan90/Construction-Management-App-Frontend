@@ -15,7 +15,6 @@ const LabourersWages = () => {
     type: "",
   });
 
-  // ✅ Fetch Data from API
   const fetchData = async () => {
     
     try {
@@ -37,12 +36,10 @@ const LabourersWages = () => {
     fetchData();
   }, []);
 
-  // ✅ Show Toast Messages
   const showToast = (message, type) => {
     toast(message, { type, position: "top-center", autoClose: 2000 });
   };
 
-  // ✅ Handle Input Change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewItem((prev) => ({
@@ -51,20 +48,17 @@ const LabourersWages = () => {
     }));
   };
 
-  // ✅ Open Add Modal
   const handleAddClick = () => {
     setIsEditMode(false);
     setNewItem({
       name: "",
       totalAmount: "",
       payAmount: "",
-      // remainingAmount: "",
       type: "",
     });
     setShowModal(true);
   };
 
-  // ✅ Open Edit Modal
   const handleEditClick = (item) => {
     setIsEditMode(true);
     setSelectedItem(item);
@@ -72,19 +66,16 @@ const LabourersWages = () => {
       name: item.name,
       totalAmount: item.totalAmount,
       payAmount: item.payAmount,
-      // remainingAmount: item.remainingAmount,
       type: item.type,
     });
     setShowModal(true);
   };
 
-  // ✅ Close Modal
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedItem(null);
   };
 
-  // ✅ Add New Item (POST)
   const handleAddItem = async () => {
     if (
       !newItem.name ||
@@ -112,12 +103,15 @@ const LabourersWages = () => {
         handleCloseModal();
       }
     } catch (error) {
-      showToast("Error adding item", "error");
-      console.error(error.message);
+      if (error.response.data?.message) {
+        showToast(error.response.data?.message , "error")
+      } else {
+        showToast("Error while adding item" , "error")
+        console.error(error.message)
+      }
     }
   };
 
-  // ✅ Update Existing Item (PUT)
   const handleEditItem = async () => {
     if (
       !newItem.name ||
@@ -140,7 +134,7 @@ const LabourersWages = () => {
         )
       );
       showToast("Item updated successfully!", "success");
-      fetchData(); // ✅ Refresh data immediately
+      fetchData(); 
       handleCloseModal();
     } catch (error) {
       showToast("Error updating item", "error");
@@ -148,7 +142,6 @@ const LabourersWages = () => {
     }
   };
 
-  // ✅ Delete Item (DELETE)
   const handleDeleteItem = async (id) => {
     try {
       await axios.delete(
@@ -156,7 +149,7 @@ const LabourersWages = () => {
       );
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
-      fetchData(); // ✅ Refresh data immediately
+      fetchData(); 
     } catch (error) {
       showToast("Error deleting item", "error");
       console.error(error.message);
@@ -176,7 +169,6 @@ const LabourersWages = () => {
           </button>
         </div>
 
-        {/* ✅ Table to Show Data */}
         <div className="panel-body table-responsive mt-3">
           <table className="table table-bordered text-white">
             <thead>
@@ -228,7 +220,6 @@ const LabourersWages = () => {
         </div>
       </div>
 
-      {/* ✅ Add/Edit Modal */}
       {showModal && (
         <div
           className="modal fade show d-block pt-5 "

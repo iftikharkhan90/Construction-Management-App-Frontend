@@ -159,7 +159,7 @@ const Aluminium = () => {
 
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
-      fetchData(); // ✅ Refresh data immediately
+      fetchData(); 
     } catch (error) {
       showToast("Error deleting item", "error");
       console.error(error.message);
