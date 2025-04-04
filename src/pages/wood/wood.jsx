@@ -21,7 +21,6 @@ const Wood = () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-
         {
           params: { type: "Wood" },
         }
