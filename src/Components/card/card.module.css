@@ -1,0 +1,77 @@
+.container {
+    width: 100%;
+    padding: 20px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.col {
+    flex: 1;
+    min-width: 300px;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 10px;
+    border: none;
+    position: relative;
+    padding: 20px;
+    box-shadow: 0 0.46875rem 2.1875rem rgba(90,97,105,0.1),
+                0 0.9375rem 1.40625rem rgba(90,97,105,0.1),
+                0 0.25rem 0.53125rem rgba(90,97,105,0.12),
+                0 0.125rem 0.1875rem rgba(90,97,105,0.1);
+}
+
+.cardStatistic {
+    text-align: center;
+}
+
+.cardIcon {
+    font-size: 80px;
+    opacity: 0.5;
+}
+
+.cardTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.progress {
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progressBar {
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(to right, #289cf5, #84c0ec);
+}
+
+/* Background Colors */
+.cherry {
+    background: linear-gradient(to right, #493240, #f09);
+    color: #fff;
+}
+
+.blueDark {
+    background: linear-gradient(to right, #373b44, #4286f4);
+    color: #fff;
+}
+
+.greenDark {
+    background: linear-gradient(to right, #0a504a, #38ef7d);
+    color: #fff;
+}
+
+.orangeDark {
+    background: linear-gradient(to right, #a86008, #ffba56);
+    color: #fff;
+}

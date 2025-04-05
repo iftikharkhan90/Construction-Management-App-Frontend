@@ -11,20 +11,29 @@ import LabourersWages from "../../pages/labourer's wages/labourer'swages";
 import  Ceiling  from "../../pages/ceiling/ceiling";
 import Cookies from 'js-cookie'
 import { toast } from "react-toastify";
+import OtherExpensives from "../../pages/Others/other";
+import TotalExpensives from "../../pages/total expensives/total";
+import Cards from "../card/card";
 
 export const Header = () => {
   const [selectedPage, setSelectedPage] = useState("Building Material");
   const [showSidebar, setShowSidebar] = useState(false);
+  const [childData , setChildData] = useState('')
+  const handleChild = (data)=>{
+    setChildData(data);
+  }
 
   const componentMapping = {
     "Building Material": <Building />,
     Sanitary: <Sanitary />,
     Wood: <Wood />,
     Electricity: <Electricity />,
-    Aluminium: <Aluminium />,
+    Aluminium: <Aluminium amounts={handleChild} />,
     Tiles: <Tiles />,
     Ceilings: <Ceiling />,
-    "Labourer's wages": <LabourersWages />,
+    "Constructor's wages": <LabourersWages />,
+    "Other Expensives": <OtherExpensives />,
+    "Total Expensives": <TotalExpensives/> 
   };
  
   const navigate = useNavigate()
@@ -57,7 +66,7 @@ toast.success("User Logout Successfully", {
             >
               <li className="nav-item">
                 <a className="nav-link">
-                  <h1>Dashboard</h1>
+                  {/* <h1>Dashboard</h1> */}
                 </a>
               </li>
             </ul>
@@ -95,7 +104,8 @@ toast.success("User Logout Successfully", {
           showSidebar ? style.hideTable : ""
         }`}
       >
-        <div className="p-5">{componentMapping[selectedPage]}</div>
+        {selectedPage != "Total Expensives" && <Cards/> }
+        <div className="mb-3">{componentMapping[selectedPage]}</div>
       </div>
     </div>
   );

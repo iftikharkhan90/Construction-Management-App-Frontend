@@ -26,6 +26,8 @@ const Aluminium = () => {
           params: { type: "Aluminium" },
         }
       );
+      console.log("data" , response.data);
+      console.log("response" , response.data.totalAmount);
       if (Array.isArray(response.data.DATA)) {
         setData(response.data.DATA);
       } else {

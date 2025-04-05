@@ -1,0 +1,74 @@
+.container {
+  width: 100%;
+  padding: 20px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.col {
+  flex: 0 1 calc(50% - 20px);
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0.46875rem 2.1875rem rgba(90, 97, 105, 0.1),
+              0 0.9375rem 1.40625rem rgba(90, 97, 105, 0.1),
+              0 0.25rem 0.53125rem rgba(90, 97, 105, 0.12),
+              0 0.125rem 0.1875rem rgba(90, 97, 105, 0.1);
+  color: #fff;
+}
+
+.cardStatistic {
+  text-align: center;
+}
+
+.cardIcon {
+  font-size: 80px;
+  opacity: 0.6;
+  margin-bottom: 10px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Background Colors */
+.cherry {
+  background: linear-gradient(to right, #493240, #f09);
+}
+
+.blueDark {
+  background: linear-gradient(to right, #373b44, #4286f4);
+}
+
+.greenDark {
+  background: linear-gradient(to right, #0a504a, #38ef7d);
+}
+
+.orangeDark {
+  background: linear-gradient(to right, #a86008, #ffba56);
+}
+
+/* Responsive: Show 1 card per row below 768px */
+@media (max-width: 768px) {
+  .col {
+    flex: 0 1 100%;
+  }
+
+  .card {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+}

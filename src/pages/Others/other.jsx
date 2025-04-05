@@ -3,26 +3,35 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const LabourersWages = () => {
+const OtherExpensives = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [newItem, setNewItem] = useState({
-    name: "",
-    totalAmount: "",
+    itemName: "",
+    itemPrice: "",
+    totalItems: "",
     payAmount: "",
-    type: "",
+    type: "others",
   });
 
+  const handlePrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
   const fetchData = async () => {
-    
     try {
       const response = await axios.get(
-        "https://construction-management-app-backend-qqvu.vercel.app/api/getcons"
+        "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
+        {
+          params: { type: "others" },
+        }
       );
-      if (Array.isArray(response.data.data)) {
-        setData(response.data.data);
+      if (Array.isArray(response.data.DATA)) {
+        setData(response.data.DATA);
       } else {
         setData([]);
       }
@@ -36,25 +45,30 @@ const LabourersWages = () => {
     fetchData();
   }, []);
 
-  const showToast = (message, type) => {
-    toast(message, { type, position: "top-center", autoClose: 2000 });
+  const capitalizeFirstLetter = (text) => {
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewItem((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === "itemName" ? capitalizeFirstLetter(value) : value,
     }));
+  };
+
+  const showToast = (message, type) => {
+    toast(message, { type, position: "top-center", autoClose: 2000 });
   };
 
   const handleAddClick = () => {
     setIsEditMode(false);
     setNewItem({
-      name: "",
-      totalAmount: "",
+      itemName: "",
+      itemPrice: "",
+      totalItems: "",
       payAmount: "",
-      type: "",
+      type: "others",
     });
     setShowModal(true);
   };
@@ -63,8 +77,9 @@ const LabourersWages = () => {
     setIsEditMode(true);
     setSelectedItem(item);
     setNewItem({
-      name: item.name,
-      totalAmount: item.totalAmount,
+      itemName: capitalizeFirstLetter(item.itemName),
+      itemPrice: item.itemPrice,
+      totalItems: item.totalItems,
       payAmount: item.payAmount,
       type: item.type,
     });
@@ -78,10 +93,10 @@ const LabourersWages = () => {
 
   const handleAddItem = async () => {
     if (
-      !newItem.name ||
-      !newItem.totalAmount ||
-      !newItem.payAmount ||
-      !newItem.type
+      !newItem.itemName ||
+      !newItem.itemPrice ||
+      !newItem.totalItems ||
+      !newItem.payAmount
     ) {
       showToast("Please fill all fields!", "warning");
       return;
@@ -89,21 +104,20 @@ const LabourersWages = () => {
 
     try {
       const response = await axios.post(
-        "https://construction-management-app-backend-qqvu.vercel.app/api/cons",
+        "https://construction-management-app-backend-qqvu.vercel.app/api/material",
         newItem
       );
-      console.log("Response" , response.data.Data);
-      if (response.data && response.data.Data) {        
-        setData((prev) => [...prev, response.data.Data]);
+      if (response.data && response.data.DATA) {
+        setData((prev) => [...prev, response.data.DATA]);
         showToast("Item added successfully!", "success");
-        fetchData(); 
+        fetchData();
         handleCloseModal();
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        showToast(error.response.data?.message, "error")
+        showToast(error.response.data?.message, "error");
       } else {
-        showToast("Error while adding item", "error");
+        showToast("Error adding item", "error");
         console.error(error.message);
       }
     }
@@ -111,10 +125,10 @@ const LabourersWages = () => {
 
   const handleEditItem = async () => {
     if (
-      !newItem.name ||
-      !newItem.totalAmount ||
-      !newItem.payAmount ||
-      !newItem.type
+      !newItem.itemName ||
+      !newItem.itemPrice ||
+      !newItem.totalItems ||
+      !newItem.payAmount
     ) {
       showToast("Please fill all fields!", "warning");
       return;
@@ -122,7 +136,7 @@ const LabourersWages = () => {
 
     try {
       await axios.put(
-        `https://construction-management-app-backend-qqvu.vercel.app/api/updatecons/${selectedItem._id}`,
+        `https://construction-management-app-backend-qqvu.vercel.app/api/update/${selectedItem._id}`,
         newItem
       );
       setData((prev) =>
@@ -131,24 +145,10 @@ const LabourersWages = () => {
         )
       );
       showToast("Item updated successfully!", "success");
-      fetchData(); 
+      fetchData();
       handleCloseModal();
     } catch (error) {
       showToast("Error updating item", "error");
-      console.error(error.message);
-    }
-  };
-
-  const handleDeleteItem = async (id) => {
-    try {
-      await axios.delete(
-        `https://construction-management-app-backend-qqvu.vercel.app/api/delcons/${id}`
-      );
-      setData((prev) => prev.filter((item) => item._id !== id));
-      showToast("Item deleted successfully!", "success");
-      fetchData(); 
-    } catch (error) {
-      showToast("Error deleting item", "error");
       console.error(error.message);
     }
   };
@@ -171,8 +171,9 @@ const LabourersWages = () => {
             <thead>
               <tr>
                 <th>#</th>
-                <th>Type</th>
-                <th>Name</th>
+                <th>Item Name</th>
+                <th>Item Price</th>
+                <th>No. of Items</th>
                 <th>Total Amount</th>
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
@@ -184,30 +185,17 @@ const LabourersWages = () => {
                 data.map((item, index) => (
                   <tr key={item._id}>
                     <td>{index + 1}</td>
-                    <th>{item.type}</th>
-                    <td>{item.name}</td>
+                    <td>{item.itemName}</td>
+                    <td>{item.itemPrice}</td>
+                    <td>{item.totalItems}</td>
                     <td>{item.totalAmount}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
-                    {/* <td>
-                      <button
-                        className="btn btn-sm btn-warning me-2"
-                        onClick={() => handleEditClick(item)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDeleteItem(item._id)}
-                      >
-                        Delete
-                      </button>
-                    </td> */}
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="text-center">
+                  <td colSpan="8" className="text-center">
                     No Data Available
                   </td>
                 </tr>
@@ -218,33 +206,35 @@ const LabourersWages = () => {
       </div>
 
       {showModal && (
-        <div
-          className="modal fade show d-block pt-5 "
-          style={{ background: "rgba(0,0,0,0.6)" }}
-        >
-          <div className="modal-dialog mt-5 p-lg-1 p-sm-5 ">
-            <div className="modal-content ">
-              <div className="modal-header ">
+        <div className="modal fade show d-block popUp">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
                 <h5 className="modal-title">
                   {isEditMode ? "Edit Material" : "Add New Material"}
                 </h5>
-                <button
-                  className="btn-close"
-                  onClick={handleCloseModal}
-                ></button>
+                <button className="btn-close" onClick={handleCloseModal}>
+                  &times;
+                </button>
               </div>
               <div className="modal-body">
-                {Object.keys(newItem).map((key) => (
-                  <input
-                    key={key}
-                    type="text"
-                    name={key}
-                    value={newItem[key]}
-                    onChange={handleInputChange}
-                    className="form-control mb-2"
-                    placeholder={key}
-                  />
-                ))}
+                {Object.keys(newItem).map(
+                  (key) =>
+                    key !== "type" && (
+                      <div key={key} className="form-floating mb-3">
+                        <input
+                          id={`floatingInput-${key}`}
+                          type="text"
+                          name={key}
+                          value={newItem[key]}
+                          onChange={handleInputChange}
+                          className="form-control"
+                          placeholder={key}
+                        />
+                        <label htmlFor={`floatingInput-${key}`}>{key}</label>
+                      </div>
+                    )
+                )}
               </div>
               <div className="modal-footer">
                 <button
@@ -264,4 +254,4 @@ const LabourersWages = () => {
   );
 };
 
-export default LabourersWages;
+export default OtherExpensives;

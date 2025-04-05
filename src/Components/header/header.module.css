@@ -1,15 +1,32 @@
 /* Sidebar */
-.one {
+/* .one {
     width: 25%;
-    background: url('../../assets/bg-pic.jpg') center center;
-    background-position: center bottom;
+    background: url('../../assets/img3.png')   ;
+    background: linear-gradient(to right,#f49242, #4e525c);
+    box-shadow: 2px 4px 10px 3px white;
+    background-color: gainsboro;
+    background-size: cover;
+    background-position:  bottom;
     transition: all 0.3s ease-in-out;
+} */
+.one {
+  width: 25%;
+          background: linear-gradient(to right, #4e525c, #f49242);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  background-size: cover;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  z-index: 10;
 }
+
+
 
 /* Main Content */
 .two {
+  background: linear-gradient(to right, #f49242, #4e525c);
     width: 75%;
-    background-image: url('../../assets/bg-pic.jpg');
+    /* background-image: url('../../assets/img2.jpg'); */
+    /* color: #fff; */
     background-size: cover;
     background-repeat: no-repeat;
     transition: all 0.3s ease-in-out;
@@ -59,7 +76,7 @@
 /* Table Styling */
 .tableContainer {
     width: 100%;
-    margin-top: 20px;
+    /* margin-top: 20px; */
 }
 
 table {
@@ -68,9 +85,9 @@ table {
 }
 
 table th, table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+    /* border: 1px solid #ddd; */
+    /* padding: 8px; */
+    /* text-align: left; */
 }
 
 /* Responsive Design */
