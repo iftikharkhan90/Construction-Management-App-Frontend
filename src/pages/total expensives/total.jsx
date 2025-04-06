@@ -1,34 +1,58 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./total.module.css";
-
-const data = [
-  {
-    title: "Total Amount ",
-    count: "0",
-    bgClass: styles.cherry,
-  },
-  {
-    title: "Paid Amount",
-    count: "0",
-    bgClass: styles.blueDark,
-  },
-  {
-    title: "Remaining Amount",
-    count: "0",
-    bgClass: styles.greenDark,
-  },
-  {
-    title: "Remaining Amount",
-    count: "0",
-    bgClass: styles.orangeDark,
-  },
-];
+import axios from "axios";
 
 const TotalExpensives = () => {
+  const [totals, setTotals] = useState({
+    totalAmount: 0,
+    payAmount: 0,
+    remainingAmount: 0,
+  });
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        "https://construction-management-app-backend-qqvu.vercel.app/api/total"
+      );
+
+      const { totalAmount, payAmount, remainingAmount } = response.data;
+
+      setTotals({
+        totalAmount: totalAmount || 0,
+        payAmount: payAmount || 0,
+        remainingAmount: remainingAmount || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching totals:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const cardData = [
+    {
+      title: "Total Amount",
+      count: totals.totalAmount,
+      bgClass: styles.cherry,
+    },
+    {
+      title: "Paid Amount",
+      count: totals.payAmount,
+      bgClass: styles.blueDark,
+    },
+    {
+      title: "Remaining Amount",
+      count: totals.remainingAmount,
+      bgClass: styles.greenDark,
+    },
+  ];
+
   return (
     <div className={styles.container}>
       <div className={styles.row}>
-        {data.map((item, index) => (
+        {cardData.map((item, index) => (
           <Card key={index} item={item} />
         ))}
       </div>
@@ -45,7 +69,7 @@ const Card = ({ item }) => {
             <i className="fas fa-wallet"></i>
           </div>
           <h1 className={styles.cardTitle}>
-            {item.title} : ({item.count})
+            {item.title}: ({item.count})
           </h1>
         </div>
       </div>
