@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Building = () => {
+const Building = ({totalAmounts}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -35,6 +35,13 @@ const Building = () => {
         setData(response.data.DATA);
       } else {
         setData([]);
+      }
+      if (totalAmounts && response.data) {
+        totalAmounts({
+          totalAmount:response.data.totalAmount || 0,
+          payAmount:response.data.payAmount || 0,
+          remainingAmount:response.data.remainingAmount || 0,
+        })
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);

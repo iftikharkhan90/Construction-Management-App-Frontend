@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Aluminium = () => {
+const Aluminium = ({ totalAmounts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -21,17 +21,20 @@ const Aluminium = () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-
-        {
-          params: { type: "Aluminium" },
-        }
+        { params: { type: "Aluminium" } }
       );
-      console.log("data" , response.data);
-      console.log("response" , response.data.totalAmount);
+
       if (Array.isArray(response.data.DATA)) {
         setData(response.data.DATA);
       } else {
         setData([]);
+      }
+      if (totalAmounts && response.data) {
+        totalAmounts({
+          totalAmount: response.data.totalAmount || 0,
+          payAmount: response.data.payAmount || 0,
+          remainingAmount: response.data.remainingAmount || 0,
+        });
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -103,7 +106,6 @@ const Aluminium = () => {
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/material",
-
         newItem
       );
       if (response.data && response.data.DATA) {
@@ -114,7 +116,7 @@ const Aluminium = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        showToast(error.response.data?.message, "error")
+        showToast(error.response.data?.message, "error");
       } else {
         showToast("Error adding item", "error");
         console.error(error.message);
@@ -136,7 +138,6 @@ const Aluminium = () => {
     try {
       await axios.put(
         `https://construction-management-app-backend-qqvu.vercel.app/api/update/${selectedItem._id}`,
-
         newItem
       );
       setData((prev) =>
@@ -158,10 +159,9 @@ const Aluminium = () => {
       await axios.delete(
         `https://construction-management-app-backend-qqvu.vercel.app/api/del/${id}`
       );
-
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
-      fetchData(); 
+      fetchData();
     } catch (error) {
       showToast("Error deleting item", "error");
       console.error(error.message);
@@ -192,7 +192,6 @@ const Aluminium = () => {
                 <th>Total Amount</th>
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
-                {/* <th>Action</th> */}
               </tr>
             </thead>
             <tbody>
@@ -206,25 +205,11 @@ const Aluminium = () => {
                     <td>{item.totalAmount}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
-                    {/* <td>
-                      <button
-                        className="btn btn-sm btn-warning me-2"
-                        onClick={() => handleEditClick(item)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDeleteItem(item._id)}
-                      >
-                        Delete
-                      </button>
-                    </td> */}
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center">
+                  <td colSpan="7" className="text-center">
                     No Data Available
                   </td>
                 </tr>
