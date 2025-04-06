@@ -94,7 +94,7 @@ table {
 
   .two {
     width: 100% !important;
-    min-height: 100vh; /* 👈 essential fix for mobile height issue */
+    min-height: 100vh; 
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
