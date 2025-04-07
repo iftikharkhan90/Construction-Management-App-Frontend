@@ -32,20 +32,24 @@ export const Header = () => {
     "Total Expensives": {},
   });
 console.log(dataMap);
-
- const handleUpdateData = (page, data) => {
-   const isEmpty =
-     !data ||
-     (typeof data === "object" &&
-       Object.keys(data).length === 0 &&
-       data.constructor === Object);
-
-   setDataMap((prev) => ({
-     ...prev,
-     [page]: isEmpty
-       ? { totalAmount: 0, payAmount: 0, remainingAmount: 0 }
-       : data,
-   }));
+const handleUpdateData = (page, data) => {
+   setDataMap(null);
+  if (page && data) {
+    
+    const isEmpty =
+      !data ||
+      (typeof data === "object" &&
+        Object.keys(data).length === 0 &&
+        data.constructor === Object);
+    setDataMap((prev) => ({
+      ...prev,
+      [page]: isEmpty
+        ? { totalAmount: 0, payAmount: 0, remainingAmount: 0 }
+        : data,
+    }));
+  }else {
+    setDataMap(null);
+  }
  };
 
 
