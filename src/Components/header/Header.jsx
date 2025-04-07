@@ -18,61 +18,63 @@ import Cards from "../card/card";
 export const Header = () => {
   const [selectedPage, setSelectedPage] = useState("Building Material");
   const [showSidebar, setShowSidebar] = useState(false);
-  const [childData, setChildData] = useState({});
-  console.log("childata",childData);
-  
-  const handleAluminuim = (data) => {
-    console.log("Received from aluminium:", data);
-    setChildData(data);
-  };
-  const handleBuilding = (data) => {
-    console.log("Received from building:", data);
-    setChildData(data);
-  };
-  const handleSanitary = (data) => {
-    console.log("Received from sanitary:", data);
-    setChildData(data);
-  };
-  const handleWood = (data) => {
-    console.log("Received from wood:", data);
-    setChildData(data);
-  };
-  const handleElectricity = (data) => {
-    console.log("Received from electricity:", data);
-    setChildData(data);
-  };
-  const handleTiles = (data) => {
-    console.log("Received from tiles:", data);
-    setChildData(data);
-  };
-  const handleCeiling = (data) => {
-    console.log("Received from ceiling:", data);
-    setChildData(data);
-  };
-  const handleContructorsWages = (data) => {
-    console.log("Received from constructors wages:", data);
-    setChildData(data);
-  };
-  const handleOtherExpensives = (data) => {
-    console.log("Received from ither expensives:", data);
-    setChildData(data);
-  };
-  const handleTotalExpensives = (data) => {
-    console.log("Received from total expensives:", data);
-    setChildData(data);
+  const [dataMap, setDataMap] = useState({
+    "Building Material": {},
+    Sanitary: {},
+    Wood: {},
+    Electricity: {},
+    Aluminium: {},
+    Tiles: {},
+    Ceilings: {},
+    "Constructor's wages": {},
+    "Other Expensives": {},
+    "Total Expensives": {},
+  });
+
+  const handleUpdateData = (page, data) => {
+    setDataMap((prev) => ({
+      ...prev,
+      [page]: data,
+    }));
   };
 
   const componentMapping = {
-    "Building Material": <Building totalAmounts={handleBuilding} />,
-    Sanitary: <Sanitary totalAmounts={handleSanitary} />,
-    Wood: <Wood totalAmounts={handleWood}/>,
-    Electricity: <Electricity totalAmounts={handleElectricity} />,
-    Aluminium: <Aluminium totalAmounts={handleAluminuim} />,
-    Tiles: <Tiles totalAmounts={handleTiles}/>,
-    Ceilings: <Ceiling totalAmounts={handleCeiling} />,
-    "Constructor's wages": <LabourersWages totalAmounts={handleContructorsWages}/>,
-    "Other Expensives": <OtherExpensives totalAmounts={handleOtherExpensives}/>,
-    "Total Expensives": <TotalExpensives totalAmounts={handleTotalExpensives}/>,
+    "Building Material": (
+      <Building
+        totalAmounts={(data) => handleUpdateData("Building Material", data)}
+      />
+    ),
+    Sanitary: (
+      <Sanitary totalAmounts={(data) => handleUpdateData("Sanitary", data)} />
+    ),
+    Wood: <Wood totalAmounts={(data) => handleUpdateData("Wood", data)} />,
+    Electricity: (
+      <Electricity
+        totalAmounts={(data) => handleUpdateData("Electricity", data)}
+      />
+    ),
+    Aluminium: (
+      <Aluminium totalAmounts={(data) => handleUpdateData("Aluminium", data)} />
+    ),
+    Tiles: <Tiles totalAmounts={(data) => handleUpdateData("Tiles", data)} />,
+    Ceilings: (
+      <Ceiling totalAmounts={(data) => handleUpdateData("Ceilings", data)} />
+    ),
+    "Constructor's wages": (
+      <LabourersWages
+        totalAmounts={(data) => handleUpdateData("Constructor's wages", data)}
+      />
+    ),
+    "Other Expensives": (
+      <OtherExpensives
+        totalAmounts={(data) => handleUpdateData("Other Expensives", data)}
+      />
+    ),
+    "Total Expensives": (
+      <TotalExpensives
+        totalAmounts={(data) => handleUpdateData("Total Expensives", data)}
+      />
+    ),
   };
 
   const navigate = useNavigate();
@@ -139,7 +141,9 @@ export const Header = () => {
           showSidebar ? style.hideTable : ""
         }`}
       >
-        {selectedPage !== "Total Expensives" && <Cards childData = {childData} />}
+        {selectedPage !== "Total Expensives" && (
+          <Cards childData={dataMap[selectedPage] || {}} />
+        )}
         <div className="mb-3">{componentMapping[selectedPage]}</div>
       </div>
     </div>
