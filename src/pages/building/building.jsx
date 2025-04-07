@@ -16,13 +16,8 @@ const Building = ({totalAmounts}) => {
     payAmount: "",
     type: "Building",
   });
+console.log("new item" , newItem);
 
-
-  const handlePrev = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
   const fetchData = async () => {
     try {
       const response = await axios.get(

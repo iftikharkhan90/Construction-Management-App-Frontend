@@ -18,6 +18,7 @@ import Cards from "../card/card";
 export const Header = () => {
   const [selectedPage, setSelectedPage] = useState("Building Material");
   const [showSidebar, setShowSidebar] = useState(false);
+  const [tableLoaded, setTableLoaded] = useState(false);
   const [dataMap, setDataMap] = useState({
     "Building Material": {},
     Sanitary: {},
@@ -30,13 +31,23 @@ export const Header = () => {
     "Other Expensives": {},
     "Total Expensives": {},
   });
+console.log(dataMap);
 
-  const handleUpdateData = (page, data) => {
-    setDataMap((prev) => ({
-      ...prev,
-      [page]: data,
-    }));
-  };
+ const handleUpdateData = (page, data) => {
+   const isEmpty =
+     !data ||
+     (typeof data === "object" &&
+       Object.keys(data).length === 0 &&
+       data.constructor === Object);
+
+   setDataMap((prev) => ({
+     ...prev,
+     [page]: isEmpty
+       ? { totalAmount: 0, payAmount: 0, remainingAmount: 0 }
+       : data,
+   }));
+ };
+
 
   const componentMapping = {
     "Building Material": (

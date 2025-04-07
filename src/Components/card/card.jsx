@@ -2,6 +2,10 @@ import React from "react";
 import styles from "./card.module.css";
 
 const Cards = ({ childData }) => {
+
+  console.log("DATA" ,  {childData});
+  
+
   const data = [
     {
       title: "Total Amount",
