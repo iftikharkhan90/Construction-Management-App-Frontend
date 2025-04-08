@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const OtherExpensives = ({totalAmounts}) => {
+const Others = ({ totalAmounts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -14,22 +14,18 @@ const OtherExpensives = ({totalAmounts}) => {
     itemPrice: "",
     totalItems: "",
     payAmount: "",
-    type: "others",
+    type: "Others",
+    date: "",
+    linked: false,
   });
 
-  const handlePrev = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
   const fetchData = async () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-        {
-          params: { type: "others" },
-        }
+        { params: { type: "Others" } }
       );
+
       if (Array.isArray(response.data.DATA)) {
         setData(response.data.DATA);
       } else {
@@ -56,11 +52,22 @@ const OtherExpensives = ({totalAmounts}) => {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const formatLabel = (label) => {
+    return label
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase());
+  };
+
+  const handleCheckBox = (e) => {
+    const { name, value, type, checked } = e.target;
     setNewItem((prev) => ({
       ...prev,
-      [name]: name === "itemName" ? capitalizeFirstLetter(value) : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : name === "itemName"
+          ? capitalizeFirstLetter(value)
+          : value,
     }));
   };
 
@@ -75,7 +82,9 @@ const OtherExpensives = ({totalAmounts}) => {
       itemPrice: "",
       totalItems: "",
       payAmount: "",
-      type: "others",
+      type: "Others",
+      date: "",
+      linked: false,
     });
     setShowModal(true);
   };
@@ -89,6 +98,8 @@ const OtherExpensives = ({totalAmounts}) => {
       totalItems: item.totalItems,
       payAmount: item.payAmount,
       type: item.type,
+      date: item.date,
+      linked: item.linked || false,
     });
     setShowModal(true);
   };
@@ -103,16 +114,18 @@ const OtherExpensives = ({totalAmounts}) => {
       !newItem.itemName ||
       !newItem.itemPrice ||
       !newItem.totalItems ||
-      !newItem.payAmount
+      !newItem.payAmount ||
+      !newItem.date
     ) {
       showToast("Please fill all fields!", "warning");
       return;
     }
 
+    const formattedDate = new Date(newItem.date).toLocaleDateString("en-GB");
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/material",
-        newItem
+        { ...newItem, date: formattedDate }
       );
       if (response.data && response.data.DATA) {
         setData((prev) => [...prev, response.data.DATA]);
@@ -160,6 +173,20 @@ const OtherExpensives = ({totalAmounts}) => {
     }
   };
 
+  const handleDeleteItem = async (id) => {
+    try {
+      await axios.delete(
+        `https://construction-management-app-backend-qqvu.vercel.app/api/del/${id}`
+      );
+      setData((prev) => prev.filter((item) => item._id !== id));
+      showToast("Item deleted successfully!", "success");
+      fetchData();
+    } catch (error) {
+      showToast("Error deleting item", "error");
+      console.error(error.message);
+    }
+  };
+
   return (
     <div className="container mt-4">
       <div
@@ -184,7 +211,8 @@ const OtherExpensives = ({totalAmounts}) => {
                 <th>Total Amount</th>
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
-                {/* <th>Action</th> */}
+                <th>Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -198,11 +226,26 @@ const OtherExpensives = ({totalAmounts}) => {
                     <td>{item.totalAmount}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
+                    <td>{new Date(item.date).toLocaleDateString("en-GB")}</td>
+                    <td>
+                      <button
+                        className="btn btn-sm btn-warning me-2"
+                        onClick={() => handleEditClick(item)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDeleteItem(item._id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center">
+                  <td colSpan="9" className="text-center">
                     No Data Available
                   </td>
                 </tr>
@@ -220,29 +263,59 @@ const OtherExpensives = ({totalAmounts}) => {
                 <h5 className="modal-title">
                   {isEditMode ? "Edit Material" : "Add New Material"}
                 </h5>
-                <button 
-                className="btn-close"
-                 onClick={handleCloseModal}>
-                </button>
+                <button
+                  className="btn-close"
+                  onClick={handleCloseModal}
+                ></button>
               </div>
               <div className="modal-body">
-                {Object.keys(newItem).map(
-                  (key) =>
-                    key !== "type" && (
-                      <div key={key} className="form-floating mb-3">
-                        <input
-                          id={`floatingInput-${key}`}
-                          type="text"
-                          name={key}
-                          value={newItem[key]}
-                          onChange={handleInputChange}
-                          className="form-control"
-                          placeholder={key}
-                        />
-                        <label htmlFor={`floatingInput-${key}`}>{key}</label>
-                      </div>
-                    )
-                )}
+                {/* Checkbox always on top */}
+                <div className="form-check mb-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="linked"
+                    checked={newItem.linked}
+                    onChange={(e) =>
+                      setNewItem((prev) => ({
+                        ...prev,
+                        linked: e.target.checked,
+                      }))
+                    }
+                    id="checkbox-linked"
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-linked">
+                    Linked Item
+                  </label>
+                </div>
+
+                {/* Render other fields dynamically */}
+                {Object.keys(newItem).map((key) => {
+                  if (key === "type" || key === "linked") return null;
+
+                  return (
+                    <div key={key} className="form-floating mb-3">
+                      <input
+                        id={`floatingInput-${key}`}
+                        type={
+                          key === "itemName" || key === "name"
+                            ? "text"
+                            : key === "date"
+                            ? "date"
+                            : "number"
+                        }
+                        name={key}
+                        value={newItem[key]}
+                        onChange={handleCheckBox}
+                        className="form-control"
+                        placeholder={formatLabel(key)}
+                      />
+                      <label htmlFor={`floatingInput-${key}`}>
+                        {formatLabel(key)}
+                      </label>
+                    </div>
+                  );
+                })}
               </div>
               <div className="modal-footer">
                 <button
@@ -262,4 +335,4 @@ const OtherExpensives = ({totalAmounts}) => {
   );
 };
 
-export default OtherExpensives;
+export default Others;

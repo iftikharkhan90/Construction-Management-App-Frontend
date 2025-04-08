@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Sanitary = ({totalAmounts}) => {
+const Sanitary = ({ totalAmounts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -15,28 +15,29 @@ const Sanitary = ({totalAmounts}) => {
     totalItems: "",
     payAmount: "",
     type: "Sanitary",
+    date: "",
+    linked: false,
   });
 
   const fetchData = async () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-        {
-          params: { type: "Sanitary" },
-        }
+        { params: { type: "Sanitary" } }
       );
+
       if (Array.isArray(response.data.DATA)) {
         setData(response.data.DATA);
       } else {
         setData([]);
       }
-       if (totalAmounts && response.data) {
-         totalAmounts({
-           totalAmount: response.data.totalAmount || 0,
-           payAmount: response.data.payAmount || 0,
-           remainingAmount: response.data.remainingAmount || 0,
-         });
-       }
+      if (totalAmounts && response.data) {
+        totalAmounts({
+          totalAmount: response.data.totalAmount || 0,
+          payAmount: response.data.payAmount || 0,
+          remainingAmount: response.data.remainingAmount || 0,
+        });
+      }
     } catch (error) {
       console.error("Error fetching data:", error.message);
       setData([]);
@@ -51,11 +52,22 @@ const Sanitary = ({totalAmounts}) => {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const formatLabel = (label) => {
+    return label
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase());
+  };
+
+  const handleCheckBox = (e) => {
+    const { name, value, type, checked } = e.target;
     setNewItem((prev) => ({
       ...prev,
-      [name]: name === "itemName" ? capitalizeFirstLetter(value) : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : name === "itemName"
+          ? capitalizeFirstLetter(value)
+          : value,
     }));
   };
 
@@ -71,6 +83,8 @@ const Sanitary = ({totalAmounts}) => {
       totalItems: "",
       payAmount: "",
       type: "Sanitary",
+      date: "",
+      linked: false,
     });
     setShowModal(true);
   };
@@ -84,6 +98,8 @@ const Sanitary = ({totalAmounts}) => {
       totalItems: item.totalItems,
       payAmount: item.payAmount,
       type: item.type,
+      date: item.date,
+      linked: item.linked || false,
     });
     setShowModal(true);
   };
@@ -98,25 +114,28 @@ const Sanitary = ({totalAmounts}) => {
       !newItem.itemName ||
       !newItem.itemPrice ||
       !newItem.totalItems ||
-      !newItem.payAmount
+      !newItem.payAmount ||
+      !newItem.date
     ) {
       showToast("Please fill all fields!", "warning");
       return;
     }
+
+    const formattedDate = new Date(newItem.date).toLocaleDateString("en-GB");
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/material",
-        newItem
+        { ...newItem, date: formattedDate }
       );
       if (response.data && response.data.DATA) {
-        setData((prev) => [...prev, response.data.DATA])
-        showToast("Item added successfully!", "success")
-        fetchData()
+        setData((prev) => [...prev, response.data.DATA]);
+        showToast("Item added successfully!", "success");
+        fetchData();
         handleCloseModal();
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        showToast(error.response.data?.message, "error")
+        showToast(error.response.data?.message, "error");
       } else {
         showToast("Error adding item", "error");
         console.error(error.message);
@@ -134,10 +153,10 @@ const Sanitary = ({totalAmounts}) => {
       showToast("Please fill all fields!", "warning");
       return;
     }
+
     try {
       await axios.put(
         `https://construction-management-app-backend-qqvu.vercel.app/api/update/${selectedItem._id}`,
-
         newItem
       );
       setData((prev) =>
@@ -146,7 +165,7 @@ const Sanitary = ({totalAmounts}) => {
         )
       );
       showToast("Item updated successfully!", "success");
-      fetchData()
+      fetchData();
       handleCloseModal();
     } catch (error) {
       showToast("Error updating item", "error");
@@ -159,10 +178,9 @@ const Sanitary = ({totalAmounts}) => {
       await axios.delete(
         `https://construction-management-app-backend-qqvu.vercel.app/api/del/${id}`
       );
-
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
-      fetchData(); 
+      fetchData();
     } catch (error) {
       showToast("Error deleting item", "error");
       console.error(error.message);
@@ -193,7 +211,8 @@ const Sanitary = ({totalAmounts}) => {
                 <th>Total Amount</th>
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
-                {/* <th>Action</th> */}
+                <th>Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -207,7 +226,8 @@ const Sanitary = ({totalAmounts}) => {
                     <td>{item.totalAmount}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
-                    {/* <td>
+                    <td>{new Date(item.date).toLocaleDateString("en-GB")}</td>
+                    <td>
                       <button
                         className="btn btn-sm btn-warning me-2"
                         onClick={() => handleEditClick(item)}
@@ -220,12 +240,12 @@ const Sanitary = ({totalAmounts}) => {
                       >
                         Delete
                       </button>
-                    </td> */}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center">
+                  <td colSpan="9" className="text-center">
                     No Data Available
                   </td>
                 </tr>
@@ -236,11 +256,8 @@ const Sanitary = ({totalAmounts}) => {
       </div>
 
       {showModal && (
-        <div
-          className="modal fade show d-block pt-5"
-          style={{ background: "rgba(0,0,0,0.6)" }}
-        >
-          <div className="modal-dialog mt-5 p-lg-1 p-sm-5">
+        <div className="modal fade show d-block popUp">
+          <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
@@ -252,22 +269,53 @@ const Sanitary = ({totalAmounts}) => {
                 ></button>
               </div>
               <div className="modal-body">
-                {Object.keys(newItem).map((key) =>
-                  key !== "type" ? (
+                {/* Checkbox always on top */}
+                <div className="form-check mb-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="linked"
+                    checked={newItem.linked}
+                    onChange={(e) =>
+                      setNewItem((prev) => ({
+                        ...prev,
+                        linked: e.target.checked,
+                      }))
+                    }
+                    id="checkbox-linked"
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-linked">
+                    Linked Item
+                  </label>
+                </div>
+
+                {/* Render other fields dynamically */}
+                {Object.keys(newItem).map((key) => {
+                  if (key === "type" || key === "linked") return null;
+
+                  return (
                     <div key={key} className="form-floating mb-3">
                       <input
                         id={`floatingInput-${key}`}
-                        type="text"
+                        type={
+                          key === "itemName" || key === "name"
+                            ? "text"
+                            : key === "date"
+                            ? "date"
+                            : "number"
+                        }
                         name={key}
                         value={newItem[key]}
-                        onChange={handleInputChange}
+                        onChange={handleCheckBox}
                         className="form-control"
-                        placeholder={key}
+                        placeholder={formatLabel(key)}
                       />
-                      <label htmlFor={`floatingInput-${key}`}>{key}</label>
+                      <label htmlFor={`floatingInput-${key}`}>
+                        {formatLabel(key)}
+                      </label>
                     </div>
-                  ) : null
-                )}
+                  );
+                })}
               </div>
               <div className="modal-footer">
                 <button

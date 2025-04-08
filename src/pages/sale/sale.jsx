@@ -3,29 +3,24 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Wood = ({ totalAmounts }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+const Sale = ({ totalAmounts }) => {
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [newItem, setNewItem] = useState({
     itemName: "",
-    itemPrice: "",
-    totalItems: "",
-    payAmount: "",
-    type: "Wood",
+    totalAmount: "",
+    type: "Sale",
     date: "",
-    linked: false,
   });
 
   const fetchData = async () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-        { params: { type: "Wood" } }
+        { params: { type: "Sale" } }
       );
-
       if (Array.isArray(response.data.DATA)) {
         setData(response.data.DATA);
       } else {
@@ -44,32 +39,13 @@ const Wood = ({ totalAmounts }) => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const capitalizeFirstLetter = (text) => {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
-  const formatLabel = (label) => {
-    return label
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase());
-  };
-
-  const handleCheckBox = (e) => {
-    const { name, value, type, checked } = e.target;
-    setNewItem((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : name === "itemName"
-          ? capitalizeFirstLetter(value)
-          : value,
-    }));
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const showToast = (message, type) => {
     toast(message, { type, position: "top-center", autoClose: 2000 });
@@ -79,27 +55,42 @@ const Wood = ({ totalAmounts }) => {
     setIsEditMode(false);
     setNewItem({
       itemName: "",
-      itemPrice: "",
-      totalItems: "",
-      payAmount: "",
-      type: "Wood",
+      totalAmount: "",
       date: "",
-      linked: false,
+      type: "Sale",
+    //   linked: false,
     });
     setShowModal(true);
+  };
+
+  const formatLabel = (key) => {
+    return key
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase());
+  };
+
+  const handleCheckBox = (e) => {
+    const { name, value } = e.target;
+    setNewItem((prev) => ({
+      ...prev,
+      [name]:
+        name === "itemName"
+          ? capitalizeFirstLetter(value)
+          : name === "date"
+          ? value
+          : value,
+    }));
   };
 
   const handleEditClick = (item) => {
     setIsEditMode(true);
     setSelectedItem(item);
     setNewItem({
-      itemName: capitalizeFirstLetter(item.itemName),
-      itemPrice: item.itemPrice,
-      totalItems: item.totalItems,
-      payAmount: item.payAmount,
-      type: item.type,
+      itemName: item.itemName,
+      totalAmount: item.totalAmount,
       date: item.date,
-      linked: item.linked || false,
+      type: item.type,
+    //   linked: item.linked || false,
     });
     setShowModal(true);
   };
@@ -109,67 +100,77 @@ const Wood = ({ totalAmounts }) => {
     setSelectedItem(null);
   };
 
-  const handleAddItem = async () => {
-    if (
-      !newItem.itemName ||
-      !newItem.itemPrice ||
-      !newItem.totalItems ||
-      !newItem.payAmount ||
-      !newItem.date
-    ) {
-      showToast("Please fill all fields!", "warning");
-      return;
-    }
+const handleAddItem = async () => {
+  if (!newItem.itemName || !newItem.totalAmount || !newItem.date) {
+    showToast("Please fill all fields!", "warning");
+    return;
+  }
 
-    const formattedDate = new Date(newItem.date).toLocaleDateString("en-GB");
-    try {
-      const response = await axios.post(
-        "https://construction-management-app-backend-qqvu.vercel.app/api/material",
-        { ...newItem, date: formattedDate }
-      );
-      if (response.data && response.data.DATA) {
-        setData((prev) => [...prev, response.data.DATA]);
-        showToast("Item added successfully!", "success");
-        fetchData();
-        handleCloseModal();
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        showToast(error.response.data?.message, "error");
-      } else {
-        showToast("Error adding item", "error");
-        console.error(error.message);
-      }
-    }
+  const day = new Date(newItem.date).getDate().toString().padStart(2, "0");
+  const month = (new Date(newItem.date).getMonth() + 1)
+    .toString()
+    .padStart(2, "0");
+  const year = new Date(newItem.date).getFullYear();
+  const formattedDate = `${day}-${month}-${year}`;
+
+  const payload = {
+    itemName: newItem.itemName,
+    totalAmount: parseFloat(newItem.totalAmount),
+    type: "Sale",
+    date: formattedDate,
   };
 
+  try {
+    const response = await axios.post(
+      "https://construction-management-app-backend-qqvu.vercel.app/api/sale",
+      payload
+    );
+
+    if (response.data && response.data.Data){
+      setData((prev) => [...prev, response.data.Data]);
+      showToast("Item added successfully!", "success");
+      fetchData();
+      handleCloseModal() 
+    }
+  } catch (error) {
+    console.error("Add Item Error:", error.response?.data || error.message);
+    showToast(error.response.data?.message, "error");
+  }
+};
+
+
   const handleEditItem = async () => {
-    if (
-      !newItem.itemName ||
-      !newItem.itemPrice ||
-      !newItem.totalItems ||
-      !newItem.payAmount
-    ) {
+    const { itemName, totalAmount, date, type } = newItem;
+    if (!itemName || !totalAmount || !date) {
       showToast("Please fill all fields!", "warning");
       return;
     }
-
     try {
+      const formattedDate = new Date(date).toISOString();
+
+      const payload = {
+        itemName,
+        totalAmount,
+        date: formattedDate,
+        type,
+      };
+
       await axios.put(
         `https://construction-management-app-backend-qqvu.vercel.app/api/update/${selectedItem._id}`,
-        newItem
+        payload
       );
+
       setData((prev) =>
         prev.map((item) =>
-          item._id === selectedItem._id ? { ...item, ...newItem } : item
+          item._id === selectedItem._id ? { ...item, ...payload } : item
         )
       );
       showToast("Item updated successfully!", "success");
       fetchData();
       handleCloseModal();
     } catch (error) {
+      console.error("Edit Item Error:", error.response?.data || error.message);
       showToast("Error updating item", "error");
-      console.error(error.message);
     }
   };
 
@@ -183,7 +184,6 @@ const Wood = ({ totalAmounts }) => {
       fetchData();
     } catch (error) {
       showToast("Error deleting item", "error");
-      console.error(error.message);
     }
   };
 
@@ -206,13 +206,9 @@ const Wood = ({ totalAmounts }) => {
               <tr>
                 <th>#</th>
                 <th>Item Name</th>
-                <th>Item Price</th>
-                <th>No. of Items</th>
                 <th>Total Amount</th>
-                <th>Pay Amount</th>
-                <th>Remaining Amount</th>
                 <th>Date</th>
-                <th>Actions</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -221,11 +217,7 @@ const Wood = ({ totalAmounts }) => {
                   <tr key={item._id}>
                     <td>{index + 1}</td>
                     <td>{item.itemName}</td>
-                    <td>{item.itemPrice}</td>
-                    <td>{item.totalItems}</td>
                     <td>{item.totalAmount}</td>
-                    <td>{item.payAmount}</td>
-                    <td>{item.remainingAmount}</td>
                     <td>{new Date(item.date).toLocaleDateString("en-GB")}</td>
                     <td>
                       <button
@@ -245,7 +237,7 @@ const Wood = ({ totalAmounts }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" className="text-center">
+                  <td colSpan="5" className="text-center">
                     No Data Available
                   </td>
                 </tr>
@@ -255,6 +247,7 @@ const Wood = ({ totalAmounts }) => {
         </div>
       </div>
 
+      {/* Modal */}
       {showModal && (
         <div className="modal fade show d-block popUp">
           <div className="modal-dialog">
@@ -269,7 +262,6 @@ const Wood = ({ totalAmounts }) => {
                 ></button>
               </div>
               <div className="modal-body">
-                {/* Checkbox always on top */}
                 <div className="form-check mb-4">
                   <input
                     className="form-check-input"
@@ -289,16 +281,14 @@ const Wood = ({ totalAmounts }) => {
                   </label>
                 </div>
 
-                {/* Render other fields dynamically */}
                 {Object.keys(newItem).map((key) => {
                   if (key === "type" || key === "linked") return null;
-
                   return (
                     <div key={key} className="form-floating mb-3">
                       <input
                         id={`floatingInput-${key}`}
                         type={
-                          key === "itemName" || key === "name"
+                          key === "itemName"
                             ? "text"
                             : key === "date"
                             ? "date"
@@ -335,4 +325,4 @@ const Wood = ({ totalAmounts }) => {
   );
 };
 
-export default Wood;
+export default Sale;

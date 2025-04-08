@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Building = ({totalAmounts}) => {
+const Building = ({ totalAmounts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -15,8 +15,9 @@ const Building = ({totalAmounts}) => {
     totalItems: "",
     payAmount: "",
     type: "Building",
+    date: "",
+    linked: false,
   });
-console.log("new item" , newItem);
 
   const fetchData = async () => {
     try {
@@ -33,10 +34,10 @@ console.log("new item" , newItem);
       }
       if (totalAmounts && response.data) {
         totalAmounts({
-          totalAmount:response.data.totalAmount || 0,
-          payAmount:response.data.payAmount || 0,
-          remainingAmount:response.data.remainingAmount || 0,
-        })
+          totalAmount: response.data.totalAmount || 0,
+          payAmount: response.data.payAmount || 0,
+          remainingAmount: response.data.remainingAmount || 0,
+        });
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -52,14 +53,6 @@ console.log("new item" , newItem);
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewItem((prev) => ({
-      ...prev,
-      [name]: name === "itemName" ? capitalizeFirstLetter(value) : value,
-    }));
-  };
-
   const showToast = (message, type) => {
     toast(message, { type, position: "top-center", autoClose: 2000 });
   };
@@ -68,14 +61,28 @@ console.log("new item" , newItem);
     setIsEditMode(false);
     setNewItem({
       itemName: "",
-      itemPrice: "",
+      totalAmount: "",
       totalItems: "",
       payAmount: "",
       type: "Building",
+      date: "",
+      // linked,
     });
     setShowModal(true);
   };
 
+ const handleCheckBox = (e) => {
+   const { name, value } = e.target;
+   setNewItem((prev) => ({
+     ...prev,
+     [name]:
+       name === "itemName"
+         ? capitalizeFirstLetter(value)
+         : name === "date"
+         ? value 
+         : value,
+   }));
+ };
   const handleEditClick = (item) => {
     setIsEditMode(true);
     setSelectedItem(item);
@@ -85,6 +92,7 @@ console.log("new item" , newItem);
       totalItems: item.totalItems,
       payAmount: item.payAmount,
       type: item.type,
+      date: item.date,
     });
     setShowModal(true);
   };
@@ -94,31 +102,39 @@ console.log("new item" , newItem);
     setSelectedItem(null);
   };
 
+  const formatLabel = (key) => {
+    return key
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase());
+  };
+
   const handleAddItem = async () => {
     if (
       !newItem.itemName ||
-      !newItem.itemPrice ||
+      !newItem.totalAmount ||
       !newItem.totalItems ||
-      !newItem.payAmount
+      !newItem.payAmount ||
+      !newItem.date
     ) {
       showToast("Please fill all fields!", "warning");
       return;
     }
-
+    const formattedDate = new Date(newItem.date).toLocaleDateString("en-GB");
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/material",
-        newItem
+        { ...newItem, date: formattedDate }
       );
       if (response.data && response.data.DATA) {
         setData((prev) => [...prev, response.data.DATA]);
+
         showToast("Item added successfully!", "success");
-        fetchData(); 
+        fetchData();
         handleCloseModal();
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        showToast(error.response.data?.message, "error")
+        showToast(error.response.data?.message, "error");
       } else {
         showToast("Error adding item", "error");
         console.error(error.message);
@@ -148,7 +164,7 @@ console.log("new item" , newItem);
         )
       );
       showToast("Item updated successfully!", "success");
-      fetchData(); 
+      fetchData();
       handleCloseModal();
     } catch (error) {
       showToast("Error updating item", "error");
@@ -158,7 +174,9 @@ console.log("new item" , newItem);
 
   const handleDeleteItem = async (id) => {
     try {
-      await axios.delete(`https://construction-management-app-backend-qqvu.vercel.app/api/del/${id}`);
+      await axios.delete(
+        `https://construction-management-app-backend-qqvu.vercel.app/api/del/${id}`
+      );
       setData((prev) => prev.filter((item) => item._id !== id));
       showToast("Item deleted successfully!", "success");
       fetchData();
@@ -187,12 +205,13 @@ console.log("new item" , newItem);
               <tr>
                 <th>#</th>
                 <th>Item Name</th>
-                <th>Item Price</th>
-                <th>No. of Items</th>
                 <th>Total Amount</th>
+                <th>No. of Items</th>
+                {/* <th>Total Amount</th> */}
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
-                {/* <th>Action</th> */}
+                <th>Date</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -201,12 +220,13 @@ console.log("new item" , newItem);
                   <tr key={item._id}>
                     <td>{index + 1}</td>
                     <td>{item.itemName}</td>
-                    <td>{item.itemPrice}</td>
-                    <td>{item.totalItems}</td>
                     <td>{item.totalAmount}</td>
+                    {/* <td>{item.itemPrice}</td> */}
+                    <td>{item.totalItems}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
-                    {/* <td>
+                    <td>{new Date(item.date).toLocaleDateString("en-GB")}</td>
+                    <td>
                       <button
                         className="btn btn-sm btn-warning me-2"
                         onClick={() => handleEditClick(item)}
@@ -219,7 +239,7 @@ console.log("new item" , newItem);
                       >
                         Delete
                       </button>
-                    </td> */}
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -242,27 +262,59 @@ console.log("new item" , newItem);
                 <h5 className="modal-title">
                   {isEditMode ? "Edit Material" : "Add New Material"}
                 </h5>
-                <button className="btn-close" onClick={handleCloseModal}>
-                </button>
+                <button
+                  className="btn-close"
+                  onClick={handleCloseModal}
+                ></button>
               </div>
               <div className="modal-body">
-                {Object.keys(newItem).map(
-                  (key) =>
-                    key !== "type" && (
-                      <div key={key} className="form-floating mb-3">
-                        <input
-                          id={`floatingInput-${key}`}
-                          type="text"
-                          name={key}
-                          value={newItem[key]}
-                          onChange={handleInputChange}
-                          className="form-control"
-                          placeholder={key}
-                        />
-                        <label htmlFor={`floatingInput-${key}`}>{key}</label>
-                      </div>
-                    )
-                )}
+                {/* Checkbox always on top */}
+                <div className="form-check mb-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="linked"
+                    checked={newItem.linked}
+                    onChange={(e) =>
+                      setNewItem((prev) => ({
+                        ...prev,
+                        linked: e.target.checked,
+                      }))
+                    }
+                    id="checkbox-linked"
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-linked">
+                    Linked Item
+                  </label>
+                </div>
+
+                {/* Render other fields dynamically */}
+                {Object.keys(newItem).map((key) => {
+                  if (key === "type" || key === "linked") return null;
+
+                  return (
+                    <div key={key} className="form-floating mb-3">
+                      <input
+                        id={`floatingInput-${key}`}
+                        type={
+                          key === "itemName" || key === "name"
+                            ? "text"
+                            : key === "date"
+                            ? "date"
+                            : "number"
+                        }
+                        name={key}
+                        value={newItem[key]}
+                        onChange={handleCheckBox}
+                        className="form-control"
+                        placeholder={formatLabel(key)}
+                      />
+                      <label htmlFor={`floatingInput-${key}`}>
+                        {formatLabel(key)}
+                      </label>
+                    </div>
+                  );
+                })}
               </div>
               <div className="modal-footer">
                 <button

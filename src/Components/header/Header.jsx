@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import OtherExpensives from "../../pages/Others/other";
 import TotalExpensives from "../../pages/total expensives/total";
 import Cards from "../card/card";
+import Sale from "../../pages/sale/sale";
 
 export const Header = () => {
   const [selectedPage, setSelectedPage] = useState("Building Material");
@@ -89,6 +90,9 @@ const handleUpdateData = (page, data) => {
         totalAmounts={(data) => handleUpdateData("Total Expensives", data)}
       />
     ),
+    "Sale":(
+      <Sale />
+    )
   };
 
   const navigate = useNavigate();
@@ -155,7 +159,7 @@ const handleUpdateData = (page, data) => {
           showSidebar ? style.hideTable : ""
         }`}
       >
-        {selectedPage !== "Total Expensives" && (
+        {!["Total Expensives", "Sale"].includes(selectedPage) && (
           <Cards childData={dataMap[selectedPage] || {}} />
         )}
         <div className="mb-3">{componentMapping[selectedPage]}</div>
