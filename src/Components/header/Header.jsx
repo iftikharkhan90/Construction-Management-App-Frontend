@@ -31,7 +31,6 @@ export const Header = () => {
     "Other Expensives": {},
     "Total Expensives": {},
   });
-console.log(dataMap);
 const handleUpdateData = (page, data) => {
    setDataMap(null);
   if (page && data) {
