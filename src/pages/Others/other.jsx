@@ -220,8 +220,9 @@ const OtherExpensives = ({totalAmounts}) => {
                 <h5 className="modal-title">
                   {isEditMode ? "Edit Material" : "Add New Material"}
                 </h5>
-                <button className="btn-close" onClick={handleCloseModal}>
-                  &times;
+                <button 
+                className="btn-close"
+                 onClick={handleCloseModal}>
                 </button>
               </div>
               <div className="modal-body">

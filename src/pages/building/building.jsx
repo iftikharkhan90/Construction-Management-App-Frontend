@@ -243,7 +243,6 @@ console.log("new item" , newItem);
                   {isEditMode ? "Edit Material" : "Add New Material"}
                 </h5>
                 <button className="btn-close" onClick={handleCloseModal}>
-                  &times;
                 </button>
               </div>
               <div className="modal-body">
