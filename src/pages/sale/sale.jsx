@@ -58,7 +58,7 @@ const Sale = ({ totalAmounts }) => {
       totalAmount: "",
       date: "",
       type: "Sale",
-    //   linked: false,
+      //   linked: false,
     });
     setShowModal(true);
   };
@@ -90,7 +90,7 @@ const Sale = ({ totalAmounts }) => {
       totalAmount: item.totalAmount,
       date: item.date,
       type: item.type,
-    //   linked: item.linked || false,
+      //   linked: item.linked || false,
     });
     setShowModal(true);
   };
@@ -100,44 +100,50 @@ const Sale = ({ totalAmounts }) => {
     setSelectedItem(null);
   };
 
-const handleAddItem = async () => {
-  if (!newItem.itemName || !newItem.totalAmount || !newItem.date) {
-    showToast("Please fill all fields!", "warning");
-    return;
-  }
-
-  const day = new Date(newItem.date).getDate().toString().padStart(2, "0");
-  const month = (new Date(newItem.date).getMonth() + 1)
-    .toString()
-    .padStart(2, "0");
-  const year = new Date(newItem.date).getFullYear();
-  const formattedDate = `${day}-${month}-${year}`;
-
-  const payload = {
-    itemName: newItem.itemName,
-    totalAmount: parseFloat(newItem.totalAmount),
-    type: "Sale",
-    date: formattedDate,
-  };
-
-  try {
-    const response = await axios.post(
-      "https://construction-management-app-backend-qqvu.vercel.app/api/sale",
-      payload
-    );
-
-    if (response.data && response.data.Data){
-      setData((prev) => [...prev, response.data.Data]);
-      showToast("Item added successfully!", "success");
-      fetchData();
-      handleCloseModal() 
+  const handleAddItem = async () => {
+    if (!newItem.itemName || !newItem.totalAmount || !newItem.date) {
+      showToast("Please fill all fields!", "warning");
+      return;
     }
-  } catch (error) {
-    console.error("Add Item Error:", error.response?.data || error.message);
-    showToast(error.response.data?.message, "error");
-  }
-};
+     function formatDate(isoString) {
+       const date = new Date(isoString);
+       return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(
+         date.getDate()
+       ).padStart(2, "0")}/${date.getFullYear()}`;
+     }
 
+
+    const day = new Date(newItem.date).getDate().toString().padStart(2, "0");
+    const month = (new Date(newItem.date).getMonth() + 1)
+      .toString()
+      .padStart(2, "0");
+    const year = new Date(newItem.date).getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
+
+    const payload = {
+      itemName: newItem.itemName,
+      totalAmount: parseFloat(newItem.totalAmount),
+      type: "Sale",
+      date: formattedDate,
+    };
+
+    try {
+      const response = await axios.post(
+        "https://construction-management-app-backend-qqvu.vercel.app/api/sale",
+        payload
+      );
+
+      if (response.data && response.data.Data) {
+        setData((prev) => [...prev, response.data.Data]);
+        showToast("Item added successfully!", "success");
+        fetchData();
+        handleCloseModal();
+      }
+    } catch (error) {
+      console.error("Add Item Error:", error.response?.data || error.message);
+      showToast(error.response.data?.message, "error");
+    }
+  };
 
   const handleEditItem = async () => {
     const { itemName, totalAmount, date, type } = newItem;
@@ -218,7 +224,7 @@ const handleAddItem = async () => {
                     <td>{index + 1}</td>
                     <td>{item.itemName}</td>
                     <td>{item.totalAmount}</td>
-                    <td>{new Date(item.date).toLocaleDateString("en-GB")}</td>
+                    <td>{formatDate(item.date)}</td>
                     <td>
                       <button
                         className="btn btn-sm btn-warning me-2"

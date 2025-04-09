@@ -13,6 +13,8 @@ const LabourersWages = ({totalAmounts}) => {
     totalAmount: "",
     payAmount: "",
     type: "",
+    date: "",
+    linked: false,
   });
 
   const fetchData = async () => {
@@ -47,13 +49,14 @@ const LabourersWages = ({totalAmounts}) => {
     toast(message, { type, position: "top-center", autoClose: 2000 });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewItem((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+
+   function formatDate(isoString) {
+     const date = new Date(isoString);
+     return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(
+       date.getDate()
+     ).padStart(2, "0")}/${date.getFullYear()}`;
+   }
+
 
   const handleAddClick = () => {
     setIsEditMode(false);
@@ -62,9 +65,29 @@ const LabourersWages = ({totalAmounts}) => {
       totalAmount: "",
       payAmount: "",
       type: "",
+      date: "",
+      linked: false,
     });
     setShowModal(true);
   };
+  const formatLabel = (label) => {
+    return label
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase());
+  };
+
+    const handleCheckBox = (e) => {
+      const { name, value, type, checked } = e.target;
+      setNewItem((prev) => ({
+        ...prev,
+        [name]:
+          type === "checkbox"
+            ? checked
+            : name === "itemName"
+            ? capitalizeFirstLetter(value)
+            : value,
+      }));
+    };
 
   const handleEditClick = (item) => {
     setIsEditMode(true);
@@ -74,6 +97,8 @@ const LabourersWages = ({totalAmounts}) => {
       totalAmount: item.totalAmount,
       payAmount: item.payAmount,
       type: item.type,
+      date: item.date,
+      linked: item.linked || false,
     });
     setShowModal(true);
   };
@@ -93,11 +118,12 @@ const LabourersWages = ({totalAmounts}) => {
       showToast("Please fill all fields!", "warning");
       return;
     }
+    const formattedDate = new Date(newItem.date).toLocaleDateString("en-GB");
 
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/cons",
-        newItem
+        { ...newItem, date: formattedDate }
       );
       console.log("Response" , response.data.Data);
       if (response.data && response.data.Data) {        
@@ -183,6 +209,7 @@ const LabourersWages = ({totalAmounts}) => {
                 <th>Total Amount</th>
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
+                <th>Date</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -196,6 +223,7 @@ const LabourersWages = ({totalAmounts}) => {
                     <td>{item.totalAmount}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
+                    <td>{formatDate(item.date)}</td>
                     <td>
                       <button
                         className="btn btn-sm btn-warning me-2"
@@ -224,7 +252,7 @@ const LabourersWages = ({totalAmounts}) => {
         </div>
       </div>
 
-      {showModal && (
+      {/* {showModal && (
         <div
           className="modal fade show d-block pt-5 "
           style={{ background: "rgba(0,0,0,0.6)" }}
@@ -264,8 +292,102 @@ const LabourersWages = ({totalAmounts}) => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
+      {showModal && (
+        <div className="modal fade show d-block popUp">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  {isEditMode ? "Edit Material" : "Add New Material"}
+                </h5>
+                <button
+                  className="btn-close"
+                  onClick={handleCloseModal}
+                ></button>
+              </div>
+              <div className="modal-body">
+                {/* Checkbox always on top */}
+                <div className="form-check mb-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="linked"
+                    checked={newItem.linked}
+                    onChange={(e) =>
+                      setNewItem((prev) => ({
+                        ...prev,
+                        linked: e.target.checked,
+                      }))
+                    }
+                    id="checkbox-linked"
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-linked">
+                    Linked Item
+                  </label>
+                </div>
 
+                {/* Type field dropdown */}
+                <div className="form-floating mb-3">
+                  <select
+                    className="form-select"
+                    name="type"
+                    value={newItem.type}
+                    onChange={handleCheckBox}
+                    id="floatingInput-type"
+                  >
+                    {/* <option value="">Select Type</option> */}
+                    <option >Building</option>
+                    <option >Sanitary</option>
+                    <option >Wood</option>
+                    <option >Electricity</option>
+                    <option >Aluminium</option>
+                    <option >Tiles</option>
+                    <option >Ceiling</option>
+                  </select>
+                  <label htmlFor="floatingInput-type">Type</label>
+                </div>
+
+                {/* Render other fields dynamically (except type and linked) */}
+                {Object.keys(newItem).map((key) => {
+                  if (key === "type" || key === "linked") return null;
+
+                  return (
+                    <div key={key} className="form-floating mb-3">
+                      <input
+                        id={`floatingInput-${key}`}
+                        type={
+                          key === "itemName" || key === "name"
+                            ? "text"
+                            : key === "date"
+                            ? "date"
+                            : "number"
+                        }
+                        name={key}
+                        value={newItem[key]}
+                        onChange={handleCheckBox}
+                        className="form-control"
+                        placeholder={formatLabel(key)}
+                      />
+                      <label htmlFor={`floatingInput-${key}`}>
+                        {formatLabel(key)}
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-primary"
+                  onClick={isEditMode ? handleEditItem : handleAddItem}
+                >
+                  {isEditMode ? "Update" : "Add"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <ToastContainer />
     </div>
   );

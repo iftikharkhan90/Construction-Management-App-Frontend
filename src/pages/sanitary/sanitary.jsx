@@ -89,6 +89,13 @@ const Sanitary = ({ totalAmounts }) => {
     setShowModal(true);
   };
 
+   function formatDate(isoString) {
+     const date = new Date(isoString);
+     return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(
+       date.getDate()
+     ).padStart(2, "0")}/${date.getFullYear()}`;
+   }
+
   const handleEditClick = (item) => {
     setIsEditMode(true);
     setSelectedItem(item);
@@ -226,7 +233,7 @@ const Sanitary = ({ totalAmounts }) => {
                     <td>{item.totalAmount}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
-                    <td>{new Date(item.date).toLocaleDateString("en-GB")}</td>
+                    <td>{formatDate(item.date)}</td>
                     <td>
                       <button
                         className="btn btn-sm btn-warning me-2"
