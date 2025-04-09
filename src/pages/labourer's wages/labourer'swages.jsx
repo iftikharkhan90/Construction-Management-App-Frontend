@@ -8,6 +8,7 @@ const LabourersWages = ({totalAmounts}) => {
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const id = localStorage.getItem("UserId");
   const [newItem, setNewItem] = useState({
     name: "",
     totalAmount: "",
@@ -15,13 +16,15 @@ const LabourersWages = ({totalAmounts}) => {
     type: "",
     date: "",
     linked: false,
+    userId:id
   });
 
   const fetchData = async () => {
     
     try {
       const response = await axios.get(
-        "https://construction-management-app-backend-qqvu.vercel.app/api/getcons"
+        "https://construction-management-app-backend-qqvu.vercel.app/api/getcons",
+        { params: { userId: id } }
       );
       if (Array.isArray(response.data.data)) {
         setData(response.data.data);
@@ -123,7 +126,7 @@ const LabourersWages = ({totalAmounts}) => {
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/cons",
-        { ...newItem, date: formattedDate }
+        { ...newItem, date: formattedDate  , userId : id}
       );
       console.log("Response" , response.data.Data);
       if (response.data && response.data.Data) {        
@@ -251,48 +254,6 @@ const LabourersWages = ({totalAmounts}) => {
           </table>
         </div>
       </div>
-
-      {/* {showModal && (
-        <div
-          className="modal fade show d-block pt-5 "
-          style={{ background: "rgba(0,0,0,0.6)" }}
-        >
-          <div className="modal-dialog mt-5 p-lg-1 p-sm-5 ">
-            <div className="modal-content ">
-              <div className="modal-header ">
-                <h5 className="modal-title">
-                  {isEditMode ? "Edit Material" : "Add New Material"}
-                </h5>
-                <button
-                  className="btn-close"
-                  onClick={handleCloseModal}
-                ></button>
-              </div>
-              <div className="modal-body">
-                {Object.keys(newItem).map((key) => (
-                  <input
-                    key={key}
-                    type="text"
-                    name={key}
-                    value={newItem[key]}
-                    onChange={handleInputChange}
-                    className="form-control mb-2"
-                    placeholder={key}
-                  />
-                ))}
-              </div>
-              <div className="modal-footer">
-                <button
-                  className="btn btn-primary"
-                  onClick={isEditMode ? handleEditItem : handleAddItem}
-                >
-                  {isEditMode ? "Update" : "Add"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
       {showModal && (
         <div className="modal fade show d-block popUp">
           <div className="modal-dialog">

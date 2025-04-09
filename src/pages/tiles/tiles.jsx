@@ -9,6 +9,7 @@ const Tiles = ({ totalAmounts }) => {
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const id = localStorage.getItem("UserId")
   const [newItem, setNewItem] = useState({
     itemName: "",
     itemPrice: "",
@@ -17,13 +18,14 @@ const Tiles = ({ totalAmounts }) => {
     type: "Tiles",
     date: "",
     linked: false,
+    userId:id
   });
 
   const fetchData = async () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-        { params: { type: "Tiles" } }
+        { params: { type: "Tiles" , userId:id } }
       );
 
       if (Array.isArray(response.data.DATA)) {
@@ -132,7 +134,7 @@ const Tiles = ({ totalAmounts }) => {
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/material",
-        { ...newItem, date: formattedDate }
+        { ...newItem, date: formattedDate , userId:id }
       );
       if (response.data && response.data.DATA) {
         setData((prev) => [...prev, response.data.DATA]);

@@ -3,16 +3,19 @@ import styles from "./total.module.css";
 import axios from "axios";
 
 const TotalExpensives = () => {
+    const id = localStorage.getItem("UserId");
   const [totals, setTotals] = useState({
     totalAmount: 0,
     payAmount: 0,
     remainingAmount: 0,
+    userId:id
   });
 
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://construction-management-app-backend-qqvu.vercel.app/api/total"
+        "https://construction-management-app-backend-qqvu.vercel.app/api/total",
+        { params: { userId: id } }
       );
 
       const { totalAmount, payAmount, remainingAmount } = response.data;

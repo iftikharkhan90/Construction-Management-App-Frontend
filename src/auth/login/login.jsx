@@ -1,4 +1,4 @@
-import React, { useEffect ,useState } from "react";
+import React, { useEffect, useState } from "react";
 import style from "./login.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,12 +7,12 @@ import "react-toastify/dist/ReactToastify.css";
 // import Cookies from "js-cookie";
 
 export default function Login() {
-
-useEffect(() => {
-  // Cookies.remove("token"); 
-localStorage.removeItem("token");
-  console.log("Token removed on login page load");
-}, []);
+  useEffect(() => {
+    // Cookies.remove("token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("UserId");
+    console.log("Token and Id removed on login page load");
+  }, []);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -28,7 +28,7 @@ localStorage.removeItem("token");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-kpp2.vercel.app/api/login",
@@ -41,9 +41,11 @@ localStorage.removeItem("token");
       );
       console.log("Response", response.data);
       console.log("Token", response.data.token);
+      console.log("Token", response.data.userId);
       const token = response.data.token;
-      // Cookies.set("token", token, { expires: 7, secure: true });
+      const id = response.data.userId;
       localStorage.setItem("token", token);
+      localStorage.setItem("UserId", id);
       setFormData({
         email: "",
         password: "",
@@ -52,8 +54,8 @@ localStorage.removeItem("token");
       if (token) {
         toast.success("User Login Successfully", {
           position: "top-center",
-          autoClose: 2000, 
-          onClose: () => navigate("/home"), 
+          autoClose: 2000,
+          onClose: () => navigate("/home"),
         });
       } else {
         navigate("/");
