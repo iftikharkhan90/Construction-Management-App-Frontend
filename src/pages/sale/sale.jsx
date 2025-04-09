@@ -81,7 +81,12 @@ const Sale = ({ totalAmounts }) => {
           : value,
     }));
   };
-
+ function formatDate(isoString) {
+   const date = new Date(isoString);
+   return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(
+     date.getDate()
+   ).padStart(2, "0")}/${date.getFullYear()}`;
+ }
   const handleEditClick = (item) => {
     setIsEditMode(true);
     setSelectedItem(item);
@@ -105,13 +110,6 @@ const Sale = ({ totalAmounts }) => {
       showToast("Please fill all fields!", "warning");
       return;
     }
-     function formatDate(isoString) {
-       const date = new Date(isoString);
-       return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(
-         date.getDate()
-       ).padStart(2, "0")}/${date.getFullYear()}`;
-     }
-
 
     const day = new Date(newItem.date).getDate().toString().padStart(2, "0");
     const month = (new Date(newItem.date).getMonth() + 1)
