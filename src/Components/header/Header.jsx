@@ -9,7 +9,7 @@ import Aluminium from "../../pages/Aluminium/aluninium";
 import Tiles from "../../pages/tiles/tiles";
 import LabourersWages from "../../pages/labourer's wages/labourer'swages";
 import Ceiling from "../../pages/ceiling/ceiling";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import OtherExpensives from "../../pages/Others/other";
 import TotalExpensives from "../../pages/total expensives/total";
@@ -98,7 +98,8 @@ const handleUpdateData = (page, data) => {
   const navigate = useNavigate();
 
   const handleLogOut = () => {
-    Cookies.remove("token");
+    // Cookies.remove("token");
+    localStorage.removeItem("token");
     toast.success("User Logout Successfully", {
       position: "top-center",
       autoClose: 2000,

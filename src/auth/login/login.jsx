@@ -4,12 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 
 export default function Login() {
 
 useEffect(() => {
-  Cookies.remove("token"); 
+  // Cookies.remove("token"); 
+localStorage.removeItem("token");
   console.log("Token removed on login page load");
 }, []);
 
@@ -41,8 +42,8 @@ useEffect(() => {
       console.log("Response", response.data);
       console.log("Token", response.data.token);
       const token = response.data.token;
-      Cookies.set("token", token, { expires: 7, secure: true });
-
+      // Cookies.set("token", token, { expires: 7, secure: true });
+      localStorage.setItem("token", token);
       setFormData({
         email: "",
         password: "",
