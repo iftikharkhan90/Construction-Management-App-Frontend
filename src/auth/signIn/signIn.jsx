@@ -22,7 +22,7 @@ const handleSubmit = async (e)=>{
   e.preventDefault()
   try {
 const response = await axios.post(
-  "https://construction-management-app-backend-kpp2.vercel.app/api/signup",
+  "https://construction-management-app-backend-qqvu.vercel.app/api/signup",
   formData
 );
     console.log("Response" , response.data);      
