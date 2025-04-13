@@ -110,14 +110,15 @@ const Building = ({ totalAmounts }) => {
     setSelectedItem(null);
   };
 
+  
+  const [filteredItems, setFilteredItems] = useState([]);
+  
   const formatLabel = (key) => {
     return key
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase());
   }
-
-  const [filteredItems, setFilteredItems] = useState([]);
-
+  
   const handleCheckboxToggle = (checked) => {
     setNewItem((prev) => ({
       ...prev,
@@ -156,34 +157,8 @@ const Building = ({ totalAmounts }) => {
         })
         .catch((err) => console.error("Error fetching isLinked items", err));
     }
-  }, [newItem.isLinked]);
-//   useEffect(()=>{
-//     const fetchisLinkedItems = async () => {
-//       try {
-//       const userId = localStorage.getItem("UserId");
-//       const response = await axios.get(
-//         "https://construction-management-app-backend-qqvu.vercel.app/api/getLinked",
-//         {
-//           params: {
-//             type: "Building",
-//             userId: id,
-//           },
-//         }
-//       );
+  }, [newItem.isLinked])
 
-//       // Filter only items with remainingAmount > 0
-//       const validItems = response.data.DATA.filter(
-//         (item) => item.remainingAmount > 0
-//       );
-//       setisLinkedItems(validItems);
-//       setFilteredItems(validItems);
-//     } catch (error) {
-//       console.error("Eerror fetching isLinked items:", error);
-//     }
-//   };
-// },[])
-
-  // Handle form submit for isLinked item
   const handleSubmitisLinked = async () => {
     if (!newItem.payAmount || !newItem.date) {
       alert("Please fill all fields.");

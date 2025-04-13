@@ -269,7 +269,7 @@ const LabourersWages = ({totalAmounts}) => {
               </div>
               <div className="modal-body">
                 {/* Checkbox always on top */}
-                <div className="form-check mb-4">
+                {/* <div className="form-check mb-4">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -286,7 +286,7 @@ const LabourersWages = ({totalAmounts}) => {
                   <label className="form-check-label" htmlFor="checkbox-linked">
                     Linked Item
                   </label>
-                </div>
+                </div> */}
 
                 {/* Type field dropdown */}
                 <div className="form-floating mb-3">

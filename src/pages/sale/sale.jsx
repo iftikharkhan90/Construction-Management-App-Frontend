@@ -268,7 +268,7 @@ const Sale = ({ totalAmounts }) => {
                 ></button>
               </div>
               <div className="modal-body">
-                <div className="form-check mb-4">
+                {/*<div className="form-check mb-4">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -285,7 +285,7 @@ const Sale = ({ totalAmounts }) => {
                   <label className="form-check-label" htmlFor="checkbox-linked">
                     Linked Item
                   </label>
-                </div>
+                </div> */}
 
                 {Object.keys(newItem).map((key) => {
                   if (key === "type" || key === "linked") return null;
