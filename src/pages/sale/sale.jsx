@@ -8,20 +8,28 @@ const Sale = ({ totalAmounts }) => {
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+    const [linkedItemsMap, setLinkedItemsMap] = useState({});
+  // Pgination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
   const id = localStorage.getItem("UserId");
   const [newItem, setNewItem] = useState({
     itemName: "",
     totalAmount: "",
     type: "Sale",
     date: "",
-    userId:id
+    userId: id,
   });
 
   const fetchData = async () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-        { params: { type: "Sale"  , userId:id} }
+        { params: { type: "Sale", userId: id } }
       );
       if (Array.isArray(response.data.DATA)) {
         setData(response.data.DATA);
@@ -83,12 +91,12 @@ const Sale = ({ totalAmounts }) => {
           : value,
     }));
   };
- function formatDate(isoString) {
-   const date = new Date(isoString);
-   return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(
-     date.getDate()
-   ).padStart(2, "0")}/${date.getFullYear()}`;
- }
+  function formatDate(isoString) {
+    const date = new Date(isoString);
+    return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(
+      date.getDate()
+    ).padStart(2, "0")}/${date.getFullYear()}`;
+  }
   const handleEditClick = (item) => {
     setIsEditMode(true);
     setSelectedItem(item);
@@ -130,7 +138,7 @@ const Sale = ({ totalAmounts }) => {
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/sale",
-         { ...payload, date: formattedDate , userId:id }
+        { ...payload, date: formattedDate, userId: id }
       );
 
       if (response.data && response.data.Data) {
@@ -217,7 +225,7 @@ const Sale = ({ totalAmounts }) => {
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody>
+            {/* <tbody>
               {data.length > 0 ? (
                 data.map((item, index) => (
                   <tr key={item._id}>
@@ -248,7 +256,96 @@ const Sale = ({ totalAmounts }) => {
                   </td>
                 </tr>
               )}
+            </tbody> */}
+            <tbody>
+              {currentItems.length > 0 ? (
+                currentItems.map((item, index) => (
+                  <React.Fragment key={item._id}>
+                    <tr>
+                      <td>{indexOfFirstItem + index + 1}</td>
+                      <td>{item.itemName}</td>
+                      {/* <td>{item.itemPrice}</td> */}
+                      {/* <td>{item.totalItems}</td> */}
+                      <td>{item.totalAmount}</td>
+                      {/* <td>{item.payAmount}</td> */}
+                      {/* <td>{item.remainingAmount}</td> */}
+                      <td>{formatDate(item.date)}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-warning me-2"
+                          onClick={() => handleEditClick(item)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDeleteItem(item._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* Conditionally render linked items under each row */}
+                    {linkedItemsMap[item._id] &&
+                      linkedItemsMap[item._id].length > 0 && (
+                        <tr>
+                          <td colSpan="9">
+                            <strong>Linked Items:</strong>
+                            <select className="form-select mt-2">
+                              {linkedItemsMap[item._id].map((linked, idx) => (
+                                <option key={idx}>
+                                  {linked.itemName} - Linked Amount:{" "}
+                                  {linked.payAmount}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                        </tr>
+                      )}
+                  </React.Fragment>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center">
+                    No Data Available
+                  </td>
+                </tr>
+              )}
             </tbody>
+
+            {/* Pagination Footer */}
+            {data.length > itemsPerPage && (
+              <tfoot>
+                <tr>
+                  <td colSpan="9">
+                    <div className="d-flex justify-content-center mt-4">
+                      <nav>
+                        <ul className="pagination">
+                          {Array.from({
+                            length: Math.ceil(data.length / itemsPerPage),
+                          }).map((_, index) => (
+                            <li
+                              key={index}
+                              className={`page-item ${
+                                currentPage === index + 1 ? "active" : ""
+                              }`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => setCurrentPage(index + 1)}
+                              >
+                                {index + 1}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </nav>
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>

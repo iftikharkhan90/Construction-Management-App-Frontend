@@ -6,10 +6,18 @@ import "react-toastify/dist/ReactToastify.css";
 const Aluminium = ({ totalAmounts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
+  const [linkedItemsMap, setLinkedItemsMap] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const id = localStorage.getItem("UserId")
+  // Pgination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  
+  const id = localStorage.getItem("UserId");
   const [newItem, setNewItem] = useState({
     itemName: "",
     itemPrice: "",
@@ -18,13 +26,13 @@ const Aluminium = ({ totalAmounts }) => {
     type: "Aluminium",
     date: "",
     isLinked: false,
-    userId:id
+    userId: id,
   });
   const fetchData = async () => {
     try {
       const response = await axios.get(
         "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
-        { params: { type: "Aluminium" , userId : id } }
+        { params: { type: "Aluminium", userId: id } }
       );
 
       if (Array.isArray(response.data.DATA)) {
@@ -116,23 +124,21 @@ const Aluminium = ({ totalAmounts }) => {
     }));
   };
 
-const handleLinkedCheckbox = (checked) => {
-  setNewItem((prev) => {
-    if (prev.isLinked === checked) {
-      fetchisLinkedItems();
-    }
+  const handleLinkedCheckbox = (checked) => {
+    setNewItem((prev) => {
+      if (prev.isLinked === checked) {
+        fetchisLinkedItems();
+      }
 
-    return {
-      ...prev,
-      isLinked: checked,
-      payAmount: "",
-      date: "",
-      selectedItem: "",
-    };
-  });
-};
-
-
+      return {
+        ...prev,
+        isLinked: checked,
+        payAmount: "",
+        date: "",
+        selectedItem: "",
+      };
+    });
+  };
 
   const [isLinkedItems, setisLinkedItems] = useState([]);
   const [selectedItemId, setSelectedItemId] = useState("");
@@ -158,14 +164,13 @@ const handleLinkedCheckbox = (checked) => {
         })
         .catch((err) => console.error("Error fetching isLinked items", err));
     }
-  }, [newItem.isLinked])
+  }, [newItem.isLinked]);
 
   const handleSubmitisLinked = async () => {
     if (!newItem.payAmount || !newItem.date) {
       alert("Please fill all fields.");
       return;
     }
-
 
     const payload = {
       selectedItem: selectedItemId,
@@ -211,7 +216,7 @@ const handleLinkedCheckbox = (checked) => {
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/material",
-        { ...newItem, date: formattedDate , userId: id }
+        { ...newItem, date: formattedDate, userId: id }
       );
       if (response.data && response.data.DATA) {
         setData((prev) => [...prev, response.data.DATA]);
@@ -228,6 +233,52 @@ const handleLinkedCheckbox = (checked) => {
       }
     }
   };
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       "https://construction-management-app-backend-qqvu.vercel.app/api/getmaterials",
+  //       { params: { type: "Aluminium", userId: id } }
+  //     );
+
+  //     if (Array.isArray(response.data.DATA)) {
+  //       setData(response.data.DATA);
+  //     } else {
+  //       setData([]);
+  //     }
+
+  //     // Fetch linked items separately
+  //     const linkedRes = await axios.get(
+  //       "https://construction-management-app-backend-qqvu.vercel.app/api/getlinkeditems",
+  //       {
+  //         params: {
+  //           type: "Aluminium",
+  //           userId: id,
+  //         },
+  //       }
+  //     );
+
+  //     const map = {};
+  //     linkedRes.data.forEach((item) => {
+  //       if (!map[item.parentId]) {
+  //         map[item.parentId] = [];
+  //       }
+  //       map[item.parentId].push(item);
+  //     });
+
+  //     setLinkedItemsMap(map);
+
+  //     if (totalAmounts && response.data) {
+  //       totalAmounts({
+  //         totalAmount: response.data.totalAmount || 0,
+  //         payAmount: response.data.payAmount || 0,
+  //         remainingAmount: response.data.remainingAmount || 0,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error.message);
+  //     setData([]);
+  //   }
+  // };
 
   const handleEditItem = async () => {
     if (
@@ -292,16 +343,18 @@ const handleLinkedCheckbox = (checked) => {
               <tr>
                 <th>#</th>
                 <th>Item Name</th>
+                <th>Linked Item</th>
                 <th>Item Price</th>
                 <th>No. of Items</th>
                 <th>Total Amount</th>
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
+                <th>Linked Amount</th>
                 <th>Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
+            {/* <tbody>
               {data.length > 0 ? (
                 data.map((item, index) => (
                   <tr key={item._id}>
@@ -336,7 +389,98 @@ const handleLinkedCheckbox = (checked) => {
                   </td>
                 </tr>
               )}
+            </tbody> */}
+            <tbody>
+              {currentItems.length > 0 ? (
+                currentItems.map((item, index) => (
+                  <React.Fragment key={item._id}>
+                    <tr className={!item.name ? "bg-info" : ""}>
+                      <td>{indexOfFirstItem + index + 1}</td>
+                      <td>{item.itemName}</td>
+                      <td className="bg-info text-dark">{item.name}</td>
+                      <td>{!item.name ? item.itemPrice : ""}</td>
+                      <td>{item.totalItems}</td>
+                      <td>{item.totalAmount}</td>
+                      <td>{item.payAmount}</td>
+                      <td>{item.remainingAmount}</td>
+                      <td className="bg-info text-dark">{item.linkedAmount}</td>
+                      <td>{formatDate(item.date)}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-warning me-2"
+                          onClick={() => handleEditClick(item)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDeleteItem(item._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* Conditionally render linked items under each row */}
+                    {linkedItemsMap[item._id] &&
+                      linkedItemsMap[item._id].length > 0 && (
+                        <tr>
+                          <td>
+                            <strong>Linked Items:</strong>
+                            <select className="form-select mt-2">
+                              {linkedItemsMap[item._id].map((linked, idx) => (
+                                <option key={idx}>
+                                  {linked.itemName} - Linked Amount:{" "}
+                                  {linked.payAmount}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                        </tr>
+                      )}
+                  </React.Fragment>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center">
+                    No Data Available
+                  </td>
+                </tr>
+              )}
             </tbody>
+
+            {/* Pagination Footer */}
+            {data.length > itemsPerPage && (
+              <tfoot>
+                <tr>
+                  <td colSpan="11">
+                    <div className="d-flex justify-content-center mt-4">
+                      <nav>
+                        <ul className="pagination">
+                          {Array.from({
+                            length: Math.ceil(data.length / itemsPerPage),
+                          }).map((_, index) => (
+                            <li
+                              key={index}
+                              className={`page-item ${
+                                currentPage === index + 1 ? "active" : ""
+                              }`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => setCurrentPage(index + 1)}
+                              >
+                                {index + 1}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </nav>
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>

@@ -7,8 +7,16 @@ const Ceiling = ({ totalAmounts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
+    const [linkedItemsMap, setLinkedItemsMap] = useState({});
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  // Pgination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
   const id = localStorage.getItem("UserId");
   const [newItem, setNewItem] = useState({
     itemName: "",
@@ -289,16 +297,18 @@ const Ceiling = ({ totalAmounts }) => {
               <tr>
                 <th>#</th>
                 <th>Item Name</th>
+                <th>Linked Item</th>
                 <th>Item Price</th>
                 <th>No. of Items</th>
                 <th>Total Amount</th>
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
+                <th>Linked Amount</th>
                 <th>Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
+            {/* <tbody>
               {data.length > 0 ? (
                 data.map((item, index) => (
                   <tr key={item._id}>
@@ -333,7 +343,98 @@ const Ceiling = ({ totalAmounts }) => {
                   </td>
                 </tr>
               )}
+            </tbody> */}
+            <tbody>
+              {currentItems.length > 0 ? (
+                currentItems.map((item, index) => (
+                  <React.Fragment key={item._id}>
+                    <tr>
+                      <td>{indexOfFirstItem + index + 1}</td>
+                      <td>{item.itemName}</td>
+                      <td className="bg-info text-dark">{item.name}</td>
+                      <td>{!item.name ? item.itemPrice : ""}</td>
+                      <td>{item.totalItems}</td>
+                      <td>{item.totalAmount}</td>
+                      <td>{item.payAmount}</td>
+                      <td>{item.remainingAmount}</td>
+                      <td className="bg-info text-dark">{item.linkedAmount}</td>
+                      <td>{formatDate(item.date)}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-warning me-2"
+                          onClick={() => handleEditClick(item)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDeleteItem(item._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* Conditionally render linked items under each row */}
+                    {linkedItemsMap[item._id] &&
+                      linkedItemsMap[item._id].length > 0 && (
+                        <tr>
+                          <td colSpan="9">
+                            <strong>Linked Items:</strong>
+                            <select className="form-select mt-2">
+                              {linkedItemsMap[item._id].map((linked, idx) => (
+                                <option key={idx}>
+                                  {linked.itemName} - Linked Amount:{" "}
+                                  {linked.payAmount}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                        </tr>
+                      )}
+                  </React.Fragment>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center">
+                    No Data Available
+                  </td>
+                </tr>
+              )}
             </tbody>
+
+            {/* Pagination Footer */}
+            {data.length > itemsPerPage && (
+              <tfoot>
+                <tr>
+                  <td colSpan="11">
+                    <div className="d-flex justify-content-center mt-4">
+                      <nav>
+                        <ul className="pagination">
+                          {Array.from({
+                            length: Math.ceil(data.length / itemsPerPage),
+                          }).map((_, index) => (
+                            <li
+                              key={index}
+                              className={`page-item ${
+                                currentPage === index + 1 ? "active" : ""
+                              }`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => setCurrentPage(index + 1)}
+                              >
+                                {index + 1}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </nav>
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>

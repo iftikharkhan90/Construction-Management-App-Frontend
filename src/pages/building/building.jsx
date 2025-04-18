@@ -10,8 +10,14 @@ const Building = ({ totalAmounts }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [refreshData, setRefreshData] = useState(false);
-  const id = localStorage.getItem("UserId");
+  // Pgination
+const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 5;
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = data.slice(indexOfFirstItem, indexOfLastItem)
 
+  const id = localStorage.getItem("UserId");
   const [newItem, setNewItem] = useState({
     itemName: "",
     itemPrice: "",
@@ -139,21 +145,16 @@ const Building = ({ totalAmounts }) => {
   console.log("ID", selectedItemId);
 
   // Fetch isLinked items from API
-  useEffect(() => {
+  useEffect(() => {    
     if (newItem.isLinked) {
       axios
         .get(
           "https://construction-management-app-backend-qqvu.vercel.app/api/getselected",
-          {
-            params: {
-              type: "Building",
-              userId: id,
-            },
-          }
+          { params: { type: "Building", userId: id } }
         )
         .then((res) => {
           setisLinkedItems(res.data.message);
-          console.log("this", res.data);
+          console.log("this", res.data.message);
         })
         .catch((err) => console.error("Error fetching isLinked items", err));
     }
@@ -288,27 +289,29 @@ const Building = ({ totalAmounts }) => {
               <tr>
                 <th>#</th>
                 <th>Item Name</th>
+                <th>Linked Item</th>
                 <th>Total Amount</th>
                 <th>No. of Items</th>
                 {/* <th>Total Amount</th> */}
                 <th>Pay Amount</th>
                 <th>Remaining Amount</th>
+                <th>Linked Amount</th>
                 <th>Date</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {data.length > 0 ? (
-                data.map((item, index) => (
+              {currentItems.length > 0 ? (
+                currentItems.map((item, index) => (
                   <tr key={item._id}>
-                    <td>{index + 1}</td>
+                    <td>{indexOfFirstItem + index + 1}</td>
                     <td>{item.itemName}</td>
+                    <td className="bg-info text-dark">{item.name}</td>
                     <td>{item.totalAmount}</td>
-                    {/* <td>{item.itemPrice}</td> */}
                     <td>{item.totalItems}</td>
                     <td>{item.payAmount}</td>
                     <td>{item.remainingAmount}</td>
-                    {/* <td>{new Date(item.date).toLocaleDateString("en-GB")}</td> */}
+                    <td className="bg-info text-dark">{item.linkedAmount}</td>
                     <td>{formatDate(item.date)}</td>
                     <td>
                       <button
@@ -328,12 +331,45 @@ const Building = ({ totalAmounts }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center">
+                  <td colSpan="10" className="text-center">
                     No Data Available
                   </td>
                 </tr>
               )}
             </tbody>
+
+            {/* Pagination Footer */}
+            {data.length > itemsPerPage && (
+              <tfoot>
+                <tr>
+                  <td colSpan="10">
+                    <div className="d-flex justify-content-center mt-4">
+                      <nav>
+                        <ul className="pagination">
+                          {Array.from({
+                            length: Math.ceil(data.length / itemsPerPage),
+                          }).map((_, index) => (
+                            <li
+                              key={index}
+                              className={`page-item ${
+                                currentPage === index + 1 ? "active" : ""
+                              }`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => setCurrentPage(index + 1)}
+                              >
+                                {index + 1}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </nav>
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>
