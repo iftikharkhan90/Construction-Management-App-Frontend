@@ -186,8 +186,10 @@ const Aluminium = ({ totalAmounts }) => {
         "https://construction-management-app-backend-qqvu.vercel.app/api/linked",
         payload
       );
-      handleCloseModal();
-    } catch (error) {
+        showToast("Linked item added successfully!", "success");
+        fetchData();
+        handleCloseModal();
+      } catch (error) {
       if (error.response && error.response.status === 400) {
         showToast(error.response.data?.message, "error");
       } else {

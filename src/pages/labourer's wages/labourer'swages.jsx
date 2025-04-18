@@ -179,7 +179,9 @@ const currentItems = data.slice(indexOfFirstItem, indexOfLastItem)
         "https://construction-management-app-backend-qqvu.vercel.app/api/linkedcons",
         payload
       );
-      handleCloseModal();
+             showToast("Linked item added successfully!", "success");
+             fetchData();
+             handleCloseModal();
     } catch (error) {
       if (error.response && error.response.status === 400) {
         showToast(error.response.data?.message, "error");

@@ -167,21 +167,23 @@ const currentItems = data.slice(indexOfFirstItem, indexOfLastItem)
     }
 
 
-    const payload = {
+    const payload  = {
       selectedItem: selectedItemId,
       payAmount: newItem.payAmount,
       date: newItem.date ? newItem.date.split("-").reverse().join("-") : "",
       userId: id,
       type: "Building",
       isLinked: true,
-    };
+    }
     console.log("Pay Load", payload);
     try {
-      await axios.post(
+       await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/linked",
         payload
       );
-      handleCloseModal();
+        showToast("Linked item added successfully!", "success");
+        fetchData();
+        handleCloseModal();
     } catch (error) {
       if (error.response && error.response.status === 400) {
         showToast(error.response.data?.message, "error");
