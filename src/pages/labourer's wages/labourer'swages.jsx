@@ -24,6 +24,8 @@ const currentItems = data.slice(indexOfFirstItem, indexOfLastItem)
     isLinked: false,
     userId: id,
   });
+console.log("newItem" , newItem);
+console.log("Data" , data);
 
   const fetchData = async () => {
     try {
@@ -193,6 +195,7 @@ const currentItems = data.slice(indexOfFirstItem, indexOfLastItem)
   };
 
   const handleAddItem = async () => {
+    console.log("Submitting:", newItem); // Check if itemName or selectedItem hai
     if (
       !newItem.name ||
       !newItem.totalAmount ||
@@ -207,7 +210,7 @@ const currentItems = data.slice(indexOfFirstItem, indexOfLastItem)
     try {
       const response = await axios.post(
         "https://construction-management-app-backend-qqvu.vercel.app/api/cons",
-        { ...newItem, date: formattedDate, userId: id }
+        { ...newItem,itemName:newItem.name ,date: formattedDate, userId: id }
       );
       console.log("Response", response.data.Data);
       if (response.data && response.data.Data) {
